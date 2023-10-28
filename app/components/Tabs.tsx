@@ -1,46 +1,15 @@
 'use client';
 
-import React from 'react';
-import { Tabs, Tab, Card, CardBody, Input } from '@nextui-org/react';
+import React, { useState } from 'react';
+import { Tabs, Tab, Card, CardBody } from '@nextui-org/react';
+import DivideByEachPerson from './DivideByEachPerson';
 
 export default function TabsComponent() {
   return (
     <div className='flex w-full flex-col'>
-      <Tabs aria-label='Options' color='primary'>
-        <Tab key='photos' title='Chi cho từng người'>
-          <Card>
-            <CardBody>
-              <div className='flex flex-col gap-4'>
-                <div className='text-xl font-semibold'>
-                  Thông tin người hưởng thụ
-                </div>
-                <Input
-                  variant='bordered'
-                  isRequired
-                  label='Tên người hưởng thụ'
-                  className='max-w-xs'
-                />
-                <Input
-                  variant='bordered'
-                  isRequired
-                  label='Số tài khoản người hưởng thụ'
-                  className='max-w-xs'
-                />
-                <Input
-                  variant='bordered'
-                  isRequired
-                  label='Nội dung chuyển khoản'
-                  className='max-w-xs'
-                  typeof='number'
-                  maxLength={35}
-                  description={
-                    'Nội dung chuyển khoản viết không dấu, tối đa 35 ký tự'
-                  }
-                />
-                <hr />
-              </div>
-            </CardBody>
-          </Card>
+      <Tabs aria-label='Options' color='primary' size='lg'>
+        <Tab key='photos' title='Chia cho từng người'>
+          <DivideByEachPerson />
         </Tab>
         <Tab key='music' title='Cho đều cho mọi người'>
           <Card>

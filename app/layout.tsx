@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import 'react-toastify/dist/ReactToastify.css';
 import NextUIProviderClient from './providers/NextUIProviderClient';
 
 export const metadata: Metadata = {
