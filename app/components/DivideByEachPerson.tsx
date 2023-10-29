@@ -195,7 +195,6 @@ export default function DivideByEachPerson() {
   };
 
   const copyScript = () => {
-    console.log(listTransferPersonData);
     const markdownTable = generateMarkdownTable();
     navigator.clipboard.writeText(markdownTable).then(() => {
       setCopied(true);
@@ -374,7 +373,10 @@ export default function DivideByEachPerson() {
             <div className='flex flex-col gap-4'>
               {listTransferPerson.map(
                 (transferPerson: TypeTransferPerson, index) => (
-                  <div className='flex flex-row items-start gap-4' key={index}>
+                  <div
+                    className='flex flex-col items-start gap-4 border-b pb-4 lg:flex-row'
+                    key={index}
+                  >
                     <Controller
                       name={`transferPerson[${index}].name`}
                       control={control}

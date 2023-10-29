@@ -13,7 +13,7 @@ export default function Home() {
         )}
       >
         <div className='mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-8'>
-          <div className='flex items-center justify-between'>pay genius</div>
+          <div className='flex items-center justify-between'>QR PayShare</div>
         </div>
       </div>
       <div
@@ -26,7 +26,7 @@ export default function Home() {
               'mt-4'
             )}
           >
-            Hiện trạng <span className='text-primary'>Pay Genius</span>
+            Hiện trạng <span className='text-primary'>QR PayShare</span>
           </div>
           <div className='mt-2 font-semibold'>
             Không thể quét được mã VietQR trên App Techcombank.
