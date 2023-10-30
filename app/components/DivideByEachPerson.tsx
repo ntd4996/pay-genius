@@ -178,9 +178,9 @@ export default function DivideByEachPerson() {
   const generateMarkdownTable = () => {
     const markdownRows = listTransferPersonData.map(
       (person) =>
-        `| ${person.name} | ${
+        `| ${person.name} | ${convertPrice(
           person.amount
-        } | ![son](https://img.vietqr.io/image/${dataRender.codeBank?.label}-${
+        )} | ![son](https://img.vietqr.io/image/${dataRender.codeBank?.label}-${
           dataRender.accountNumber
         }-print.png?amount=${convertPrice(person.amount)}&accountName=${
           dataRender.nameOfTheFirstInput
