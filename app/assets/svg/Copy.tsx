@@ -3,7 +3,7 @@ import React from 'react';
 export default function Copy() {
   return (
     <svg
-      className='h-4 w-4 text-gray-800 dark:text-white'
+      className='h-4 w-4 text-white'
       aria-hidden='true'
       xmlns='http://www.w3.org/2000/svg'
       fill='currentColor'
