@@ -1,12 +1,10 @@
 'use client';
-import React, { Fragment, useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Card,
   CardBody,
   Input,
   Button,
-  RadioGroup,
-  Radio,
   Table,
   TableHeader,
   TableColumn,
@@ -537,7 +535,7 @@ export default function DivideByEachPerson() {
               {listTransferPersonData.map((person: any, index) => (
                 <TableRow key={index}>
                   <TableCell>{person.name}</TableCell>
-                  <TableCell>{person.amount}</TableCell>
+                  <TableCell>{convertPrice(person.amount)}</TableCell>
                   <TableCell className='flex w-full justify-center'>
                     <Image
                       width={200}
