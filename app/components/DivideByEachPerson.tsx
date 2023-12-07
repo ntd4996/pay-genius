@@ -23,7 +23,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import Copy from '../assets/svg/Copy';
 import CheckIcon from '../assets/svg/CheckIcon';
 import { useQuery } from '@tanstack/react-query';
-import { sql } from '@vercel/postgres';
 import axios from '../libs/axios';
 
 type TypeTransferPerson = {

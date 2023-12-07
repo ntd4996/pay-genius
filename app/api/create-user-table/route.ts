@@ -7,7 +7,9 @@ export async function GET() {
 			id SERIAL PRIMARY KEY,
 			name VARCHAR(255),
 			account_number VARCHAR(20),
-			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+			code_bank VARCHAR(255),
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	)`;
     return NextResponse.json({ result }, { status: 200 });
   } catch (error) {
