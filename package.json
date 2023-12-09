@@ -16,7 +16,10 @@
     "test-all": "npm run format && npm run check-format && npm run check-lint && npm run check-types && npm run build"
   },
   "dependencies": {
-    "@nextui-org/react": "^2.1.13",
+    "@nextui-org/react": "^2.2.9",
+    "@tanstack/react-query": "^5.10.0",
+    "@vercel/postgres": "^0.5.1",
+    "axios": "^1.6.2",
     "eslint-config-prettier": "^9.0.0",
     "framer-motion": "^10.16.4",
     "husky": "^8.0.3",

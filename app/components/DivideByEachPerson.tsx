@@ -22,6 +22,8 @@ import { DataBank } from '../data/bank';
 import { ToastContainer, toast } from 'react-toastify';
 import Copy from '../assets/svg/Copy';
 import CheckIcon from '../assets/svg/CheckIcon';
+import { useQuery } from '@tanstack/react-query';
+import axios from '../libs/axios';
 
 type TypeTransferPerson = {
   name: string;
@@ -58,6 +60,15 @@ export default function DivideByEachPerson() {
     round: '',
     totalBill: '',
     transferPerson: [],
+  });
+
+  const { isLoading } = useQuery({
+    queryKey: [`get-users`],
+    queryFn: async () => {
+      const result = await axios(`/api/get-user`);
+      console.log('🚀 ~ result:', result.data);
+      return result.data;
+    },
   });
 
   const handleFieldChange = (
@@ -211,6 +222,35 @@ export default function DivideByEachPerson() {
               Thông tin người hưởng thụ
             </div>
             <Controller
+              name='nameOfTheFirstInput'
+              control={control}
+              rules={{ required: 'Trường này là bắt buộc' }}
+              render={({ field }) => (
+                <div>
+                  <Select
+                    options={DataBank}
+                    required
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder='Tên người hưởng thụ'
+                    classNames={{
+                      control: () =>
+                        cn(
+                          'h-[56px] !border-medium  !rounded-medium !duration-150 !group-data-[focus=true]:border-foreground !focus:border-foreground',
+                          errors.codeBank
+                            ? '!border-danger'
+                            : '!border-default-200'
+                        ),
+                      option: () => cn('z-50'),
+                    }}
+                  />
+                  <div className='relative flex flex-col gap-1.5 px-1 pt-1 text-tiny text-danger'>
+                    {errors.codeBank && 'Trường này là bắt buộc'}
+                  </div>
+                </div>
+              )}
+            />
+            <Controller
               name='codeBank'
               control={control}
               rules={{ required: 'Trường này là bắt buộc' }}
@@ -240,27 +280,6 @@ export default function DivideByEachPerson() {
               )}
             />
 
-            <Controller
-              name='nameOfTheFirstInput'
-              control={control}
-              rules={{ required: 'Trường này là bắt buộc' }}
-              render={({ field }) => (
-                <Input
-                  variant='bordered'
-                  isRequired
-                  label='Tên người hưởng thụ'
-                  value={field.value}
-                  onChange={field.onChange}
-                  classNames={{
-                    inputWrapper: errors.nameOfTheFirstInput && 'border-danger',
-                    label: ['z-1'],
-                  }}
-                  errorMessage={
-                    errors.nameOfTheFirstInput && 'Trường này là bắt buộc'
-                  }
-                />
-              )}
-            />
             <Controller
               name='accountNumber'
               control={control}
