@@ -383,7 +383,7 @@ export default function Divide() {
               case 'QR':
                 return `![QR Code](https://img.vietqr.io/image/${valueBank}-${valueAccountNumber}-print.png?amount=${sumTotal(
                   index
-                )}&accountName=${valueName}=200x256)`;
+                )}&accountName=${valueName} =200x256)`;
               default:
                 return formatCurrencyVND(
                   Math.round(parseInt(person[`value-${indexColumn + 2}`]))
