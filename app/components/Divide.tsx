@@ -345,7 +345,6 @@ export default function Divide() {
       );
       return acc + partialSum;
     }, 0);
-
     return sumValues;
   };
 
