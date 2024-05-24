@@ -352,7 +352,10 @@ export default function Divide() {
   const convertTableToMarkdown = (): string => {
     const initHeaderTable = [...headerTable];
     const updatedHeader = initHeaderTable.filter(
-      (item) => item.label !== 'Xóa'
+      (item) =>
+        item.label !== 'Xóa' &&
+        item.label !== 'Số tiền' &&
+        item.label !== 'Số tiền được giảm giá'
     );
 
     const headerMarkdown = `| ${updatedHeader
@@ -386,15 +389,18 @@ export default function Divide() {
                 )}&accountName=${valueName} =200x256)`;
               default:
                 return formatCurrencyVND(
-                  Math.round(parseInt(person[`value-${indexColumn + 2}`]))
+                  Math.round(parseInt(person[`value-${indexColumn + 4}`]))
                 );
             }
           })
           .join(' | ')} |`;
       })
       .join('\n');
+    const bottom = `##### *Tổng số tiền sau khi thanh toán toàn bộ nhận được: ${formatCurrencyVND(
+      Math.round(parseInt(sumTotalBill())) || 0
+    )} :ohhhh:*`;
 
-    const markdownTable = `${headerMarkdown}\n${separatorMarkdown}\n${bodyMarkdown}`;
+    const markdownTable = `${headerMarkdown}\n${separatorMarkdown}\n${bodyMarkdown}\n\n${bottom}`;
 
     return markdownTable;
   };
@@ -581,7 +587,7 @@ export default function Divide() {
         </div>
 
         <div className='mt-4 flex w-full flex-col gap-4'>
-          <div className='text-tiny italic text-default-400'>
+          <div className='text-l italic'>
             Tổng số tiền sau khi thanh toán toàn bộ nhận được:{' '}
             {formatCurrencyVND(Math.round(parseInt(sumTotalBill())) || 0)}
           </div>
@@ -656,7 +662,7 @@ export default function Divide() {
                       switch (header.label) {
                         case 'Xóa':
                           return (
-                            <td className='border-r '>
+                            <td className='border-r ' key={indexColumn}>
                               <Button
                                 isIconOnly
                                 color='danger'
@@ -672,7 +678,7 @@ export default function Divide() {
 
                         case '@':
                           return (
-                            <td className='border-r'>
+                            <td className='border-r' key={indexColumn}>
                               <Autocomplete
                                 defaultItems={Mentions}
                                 variant='bordered'
@@ -704,7 +710,7 @@ export default function Divide() {
 
                         case 'Số tiền':
                           return (
-                            <td className='border-r'>
+                            <td className='border-r' key={indexColumn}>
                               <Input
                                 type='number'
                                 label='Số tiền'
@@ -721,26 +727,35 @@ export default function Divide() {
 
                         case 'Số tiền được giảm giá':
                           return (
-                            <td className='border-r text-center'>
+                            <td
+                              className='border-r text-center'
+                              key={indexColumn}
+                            >
                               {formatCurrencyVND(person.discountAmount)}
                             </td>
                           );
 
                         case 'Tiền sau khi giảm':
                           return (
-                            <td className='border-r text-center'>
+                            <td
+                              className='border-r text-center'
+                              key={indexColumn}
+                            >
                               {formatCurrencyVND(person.moneyAfterReduction)}
                             </td>
                           );
                         case 'Tổng Tiền':
                           return (
-                            <td className='border-r text-center'>
+                            <td
+                              className='border-r text-center'
+                              key={indexColumn}
+                            >
                               {formatCurrencyVND(sumTotal(index))}
                             </td>
                           );
                         case 'QR':
                           return (
-                            <td className='border-r'>
+                            <td className='border-r' key={indexColumn}>
                               <Image
                                 width={200}
                                 alt='NextUI hero Image'
@@ -786,6 +801,11 @@ export default function Divide() {
                 Thêm cột
               </Button>
             </div>
+          </div>
+
+          <div className='text-l italic'>
+            Tổng số tiền sau khi thanh toán toàn bộ nhận được:{' '}
+            {formatCurrencyVND(Math.round(parseInt(sumTotalBill())) || 0)}
           </div>
 
           <div className='flex justify-between'>
