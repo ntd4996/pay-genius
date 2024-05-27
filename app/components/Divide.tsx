@@ -226,6 +226,7 @@ export default function Divide() {
     updatedList[index].mention = value;
     setListTransferPerson(updatedList);
   };
+
   const changeAmount = (value: any, index: number) => {
     const updatedList = [...listTransferPerson];
     updatedList[index].amount = value.target.value;
@@ -399,7 +400,7 @@ export default function Divide() {
       Math.round(parseInt(sumTotalBill())) || 0
     )} :ohhhh:*`;
 
-    const markdownTable = `${headerMarkdown}\n${separatorMarkdown}\n${bodyMarkdown}\n\n${bottom}`;
+    const markdownTable = `\n${headerMarkdown}\n${separatorMarkdown}\n${bodyMarkdown}\n\n${bottom}`;
 
     return markdownTable;
   };
@@ -691,7 +692,7 @@ export default function Divide() {
                               >
                                 {(person) => (
                                   <AutocompleteItem
-                                    key={person.label}
+                                    key={person.value}
                                     textValue={person.label}
                                   >
                                     <div className='flex items-center gap-2'>

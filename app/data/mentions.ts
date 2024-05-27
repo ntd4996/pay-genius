@@ -1,66 +1,66 @@
 export const Mentions = [
   {
-    value: '@anhdt',
+    value: '@anhdt :gangster:',
     label: '@anhdt',
   },
   {
-    value: '@anhlh',
+    value: '@anhlh :ha_toi_loi:',
     label: '@anhlh',
   },
   {
-    value: '@anhntl',
+    value: '@anhntl :dellquantam:',
     label: '@anhntl',
   },
   {
-    value: '@anhphong',
+    value: '@anhphong :batngochua:',
     label: '@anhphong',
   },
   {
-    value: '@datnt',
+    value: '@datnt :tho_dia:',
     label: '@datnt',
   },
   {
-    value: '@ducnt',
+    value: '@ducnt :duc_ngap:',
     label: '@ducnt',
   },
   {
-    value: '@dhd',
+    value: '@dhd :run:',
     label: '@dhd',
   },
   {
-    value: '@hiennt',
+    value: '@hiennt :bruu:',
     label: '@hiennt',
   },
   {
-    value: '@hungnm',
+    value: '@hungnm :smile_in_tears:',
     label: '@hungnm',
   },
   {
-    value: '@lent',
+    value: '@lent :lee:',
     label: '@lent',
   },
   {
-    value: '@minhnb',
+    value: '@minhnb :oke-man:',
     label: '@minhnb',
   },
   {
-    value: '@nhatlq',
+    value: '@nhatlq :nhat_tron_mat:',
     label: '@nhatlq',
   },
   {
-    value: '@son',
+    value: '@son :pepe_amazed:',
     label: '@son',
   },
   {
-    value: '@sonhp',
+    value: '@sonhp :thatthan:',
     label: '@sonhp',
   },
   {
-    value: '@trant',
+    value: '@trant :pepe_cry_trans:',
     label: '@trant',
   },
   {
-    value: '@linhlh',
+    value: '@linhlh :pepe_lift:',
     label: '@linhlh',
   },
 ];
