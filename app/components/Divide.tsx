@@ -21,9 +21,10 @@ import PlusCircle from '../assets/svg/PlusCircle';
 import TrashBin from '../assets/svg/TrashBin';
 import { Mentions } from '../data/mentions';
 import Close from '../assets/svg/Close';
-import { list } from 'postcss';
 import CheckIcon from '../assets/svg/CheckIcon';
 import Copy from '../assets/svg/Copy';
+import CurrencyInput from 'react-currency-input-field';
+import NumberInput from './NumberInput';
 
 export default function Divide() {
   const {
@@ -229,9 +230,9 @@ export default function Divide() {
 
   const changeAmount = (value: any, index: number) => {
     const updatedList = [...listTransferPerson];
-    updatedList[index].amount = value.target.value;
+    updatedList[index].amount = value;
     setListTransferPerson(updatedList);
-    if (parseInt(value.target.value) !== 0) {
+    if (parseInt(value) !== 0) {
       calculator();
     }
   };
@@ -423,7 +424,6 @@ export default function Divide() {
             <div className='text-xl font-semibold'>
               Thông tin người hưởng thụ
             </div>
-
             <div className='flex w-full flex-col lg:flex-row'>
               <div className='flex w-full flex-col gap-4'>
                 <Autocomplete
@@ -556,33 +556,18 @@ export default function Divide() {
         </div>
 
         <div className='mt-4 flex gap-4 border-t-1 pt-4'>
-          <Input
-            type='number'
+          <NumberInput
             label='Tổng số tiền giảm giá'
-            variant='bordered'
-            className='max-w-lg'
-            min={0}
-            value={amountDiscount}
-            onChange={(e) => setAmountDiscount(e.target.value)}
-            endContent={
-              <div className='pointer-events-none flex items-center'>
-                <span className='text-small text-default-400'>VNĐ</span>
-              </div>
-            }
+            onChange={(e) => {
+              setAmountDiscount(e ?? '');
+            }}
           />
-          <Input
-            type='number'
-            min={0}
+
+          <NumberInput
             label='Phí Ship'
-            variant='bordered'
-            className='max-w-lg'
-            value={shipping}
-            onChange={(e) => setShipping(e.target.value)}
-            endContent={
-              <div className='pointer-events-none flex items-center'>
-                <span className='text-small text-default-400'>VNĐ</span>
-              </div>
-            }
+            onChange={(e) => {
+              setShipping(e ?? '');
+            }}
           />
         </div>
 
@@ -711,13 +696,10 @@ export default function Divide() {
                         case 'Số tiền':
                           return (
                             <td className='border-r' key={indexColumn}>
-                              <Input
-                                type='number'
+                              <NumberInput
                                 label='Số tiền'
-                                variant='bordered'
-                                className='mx-2 w-[90%] max-w-lg'
                                 value={person.amount}
-                                min={0}
+                                className='mx-2 !w-[90%] max-w-lg'
                                 onChange={(e) => {
                                   changeAmount(e, index);
                                 }}
@@ -769,17 +751,15 @@ export default function Divide() {
                         default:
                           return (
                             <td key={indexColumn} className='border-r'>
-                              <Input
-                                type='number'
-                                variant='bordered'
-                                className='mx-2 w-[90%] max-w-lg'
-                                value={person[`value-${indexColumn + 1}`]}
-                                min={0}
+                              <NumberInput
+                                label='Phí Ship'
+                                value={person.amount}
+                                className='mx-2 !w-[90%] max-w-lg'
                                 onChange={(e) => {
                                   const updatedList = [...listTransferPerson];
                                   updatedList[index][
                                     `value-${indexColumn + 1}`
-                                  ] = e.target.value;
+                                  ] = e ?? '';
                                   setListTransferPerson(updatedList);
                                 }}
                               />
