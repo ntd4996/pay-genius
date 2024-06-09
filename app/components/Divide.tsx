@@ -23,7 +23,6 @@ import { Mentions } from '../data/mentions';
 import Close from '../assets/svg/Close';
 import CheckIcon from '../assets/svg/CheckIcon';
 import Copy from '../assets/svg/Copy';
-import CurrencyInput from 'react-currency-input-field';
 import NumberInput from './NumberInput';
 
 export default function Divide() {
@@ -42,7 +41,7 @@ export default function Divide() {
   const [copied, setCopied] = useState(false);
   const [valueAccountNumber, setValueAccountNumber] =
     React.useState<string>('');
-  const [selectedKey, setSelectedKey] = React.useState<React.Key | null>(null);
+  const [selectedKey, setSelectedKey] = React.useState<any>('');
   const [shipping, setShipping] = useState('');
   const [amountDiscount, setAmountDiscount] = useState('');
   const [selectedKeyBank, setSelectedKeyBank] = React.useState<any>('');
@@ -407,6 +406,15 @@ export default function Divide() {
   };
 
   const copyScript = () => {
+    const dataSave = {
+      id: new Date(),
+      selectedKey: selectedKey,
+    };
+    const dataArraySave = [];
+    dataArraySave.push(dataSave);
+    const dataArraySaveString = JSON.stringify(dataArraySave);
+    localStorage.setItem('dataArraySave', dataArraySaveString);
+
     const markdownTable = convertTableToMarkdown();
     navigator.clipboard.writeText(markdownTable).then(() => {
       setCopied(true);
@@ -414,6 +422,26 @@ export default function Divide() {
       setTimeout(() => setCopied(false), 2000);
     });
   };
+
+  useEffect(() => {
+    const dataArraySaveString = localStorage.getItem('dataArraySave');
+    if (listUsers && dataArraySaveString) {
+      const dataArraySave = JSON.parse(dataArraySaveString);
+      const dataFind = dataArraySave[0];
+      const key = dataFind?.selectedKey;
+      const matchingDataBank = listUsers.find(
+        (user: any) => user.id.toString() === key
+      );
+      if (matchingDataBank) {
+        setValue('bank', matchingDataBank.code_bank);
+        setValue('accountNumber', matchingDataBank.account_number);
+        setValueName(matchingDataBank.name);
+        setValueBank(matchingDataBank.dataBank.label);
+        setValueAccountNumber(matchingDataBank.account_number);
+        setSelectedKeyBank(matchingDataBank.dataBank.label);
+      }
+    }
+  }, [listUsers]);
 
   return (
     <Card>
@@ -434,11 +462,12 @@ export default function Divide() {
                   variant='bordered'
                   defaultItems={listUsers}
                   className='max-w-lg'
-                  allowsCustomValue={true}
+                  allowsCustomValue={false}
                   errorMessage={errors.name && 'Trường này là bắt buộc'}
                   isInvalid={!!errors.name}
                   isLoading={isLoading}
                   onSelectionChange={onSelectionChange}
+                  selectedKey={selectedKey}
                   onInputChange={onInputChange}
                   isRequired
                   isDisabled={isLoadingPost}
