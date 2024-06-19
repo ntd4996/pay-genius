@@ -24,7 +24,7 @@ export const Mentions = [
     label: '@ducnt',
   },
   {
-    value: '@dhd :run:',
+    value: '@dhd :bruce_lee:',
     label: '@dhd',
   },
   {
@@ -52,7 +52,7 @@ export const Mentions = [
     label: '@son',
   },
   {
-    value: '@sonhp :thatthan:',
+    value: '@sonhp :jaychou:',
     label: '@sonhp',
   },
   {

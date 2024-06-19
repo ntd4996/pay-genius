@@ -698,8 +698,8 @@ export default function Divide() {
                             <td className='border-r' key={indexColumn}>
                               <NumberInput
                                 label='Số tiền'
-                                value={person.amount}
                                 className='mx-2 !w-[90%] max-w-lg'
+                                value={person.amount}
                                 onChange={(e) => {
                                   changeAmount(e, index);
                                 }}
@@ -752,14 +752,14 @@ export default function Divide() {
                           return (
                             <td key={indexColumn} className='border-r'>
                               <NumberInput
-                                label='Phí Ship'
-                                value={person.amount}
+                                label=''
                                 className='mx-2 !w-[90%] max-w-lg'
+                                value={person[`value-${indexColumn + 1}`]}
                                 onChange={(e) => {
                                   const updatedList = [...listTransferPerson];
                                   updatedList[index][
                                     `value-${indexColumn + 1}`
-                                  ] = e ?? '';
+                                  ] = e;
                                   setListTransferPerson(updatedList);
                                 }}
                               />
