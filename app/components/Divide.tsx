@@ -390,7 +390,7 @@ export default function Divide() {
                 )}&accountName=${valueName} =200x256)`;
               default:
                 return formatCurrencyVND(
-                  Math.round(parseInt(person[`value-${indexColumn + 4}`]))
+                  Math.round(parseInt(person[`value-${indexColumn + 4}`] ?? 0))
                 );
             }
           })
@@ -759,7 +759,7 @@ export default function Divide() {
                                   const updatedList = [...listTransferPerson];
                                   updatedList[index][
                                     `value-${indexColumn + 1}`
-                                  ] = e;
+                                  ] = e ?? 0;
                                   setListTransferPerson(updatedList);
                                 }}
                               />
