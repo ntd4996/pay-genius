@@ -63,4 +63,8 @@ export const Mentions = [
     value: '@linhlh :deckcandoi:',
     label: '@linhlh',
   },
+  {
+    value: '@tuandn :deckcandoi:',
+    label: '@tuandn',
+  },
 ];
