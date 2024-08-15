@@ -1,56 +1,45 @@
 'use client';
 
-import { cn } from '@nextui-org/react';
-import TabsComponent from './components/Tabs';
+import React from 'react';
+import { Button } from '@nextui-org/react';
+import { signIn, useSession } from 'next-auth/react';
+import { Boxes } from './components/ui/background-boxes';
+import { BackgroundGradient } from './components/ui/background-gradient';
+import LogoGoogle from './assets/svg/LogoGoogle';
+import { useRouter } from 'next/navigation';
 
-export default function Home() {
+export default function Login() {
+  const { data: session } = useSession();
+
+  const router = useRouter();
+
+  if (session && session.user) {
+    router.push('/split-the-bill');
+  }
+
+  const login = () => {
+    signIn('google', { callbackUrl: '/split-the-bill' });
+  };
+
   return (
-    <div className='isolate mx-auto flex min-h-screen flex-col'>
-      <div
-        className={cn(
-          'sticky inset-x-0 top-0 z-50 border-b border-gray-100 bg-white/90 py-3 backdrop-blur-lg',
-          'text-2xl capitalize '
-        )}
-      >
-        <div className='mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-8'>
-          <div className='flex items-center justify-between'>QR PayShare</div>
-        </div>
-      </div>
-      <div
-        className={cn('flex w-full flex-col', 'mx-auto max-w-screen-xl p-5')}
-      >
-        <div className='flex flex-col gap-3'>
-          <div
-            className={cn(
-              'font-display text-center text-3xl font-semibold tracking-tight text-gray-900 sm:text-left sm:text-3xl lg:text-4xl',
-              'mt-4'
-            )}
-          >
-            Hiện trạng <span className='text-primary'>QR PayShare</span>
-          </div>
-          <div className='mt-2 font-semibold'>
-            Không thể quét được mã VietQR trên App Techcombank.
-          </div>
-          <div className='leading-8'>
-            App Techcombank Mobile mới đã hỗ trợ quét mã VietQR
-            <br /> Tuy nhiên app cũ, Techcombank F@st i-bank hiện đang trong quá
-            trình chờ đóng cửa khi người dùng chuyển qua app mới, nên sẽ không
-            hỗ trợ QR
-          </div>
-          <div className='mt-2 font-semibold'>
-            Quét bằng App MBBank không điền nội dung
-          </div>
-          <div className='leading-8'>
-            Khi quét từ nút bấm scan QR ở màn hình chính (trước khi đăng nhập)
-            thì MBBank có điền nội dung. Tuy nhiên, khi bấm nút Scan ở màn hình
-            chuyển tiền thì MBBank chỉ điền STK và ngân hàng, không điền nội
-            dung và số tiền
-          </div>
-        </div>
+    <div className='relative flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-slate-900 px-4 sm:px-0 '>
+      <div className='pointer-events-none absolute inset-0 z-20 h-full w-full bg-slate-900 [mask-image:radial-gradient(transparent,white)]' />
 
-        <hr className='my-8' />
-        <TabsComponent />
-      </div>
+      <Boxes />
+      <BackgroundGradient className='w-full rounded-[22px] bg-slate-900 dark:bg-zinc-900 sm:p-10'>
+        <p className='mb-8 text-center text-xl text-white dark:text-neutral-200 sm:text-2xl'>
+          Continue <span className='font-astroSpace text-4xl'>Qr-PayShare</span>{' '}
+          with
+        </p>
+
+        <Button
+          className='group/btn relative z-20 flex h-[55px] w-full items-center justify-start space-x-2 rounded-md p-4 font-medium text-black shadow-input hover:bg-white'
+          onClick={() => login()}
+        >
+          <LogoGoogle />
+          <span className='text-sm text-neutral-700'>Sign in with Google</span>
+        </Button>
+      </BackgroundGradient>
     </div>
   );
 }

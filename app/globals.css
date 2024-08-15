@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: 'AstroSpace';
+  src: url('/fonts/AstroSpace.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}

@@ -3,6 +3,7 @@ import './globals.css';
 import 'react-toastify/dist/ReactToastify.css';
 import NextUIProviderClient from './providers/NextUIProviderClient';
 import QueryProviders from './providers/QueryProviders';
+import AuthSessionProvider from './providers/AuthSessionProvider';
 
 export const metadata: Metadata = {
   title: 'QR PayShare - Chia sẻ và Thanh toán qua Mã QR',
@@ -17,7 +18,9 @@ export default function RootLayout({
 }) {
   return (
     <QueryProviders>
-      <NextUIProviderClient>{children}</NextUIProviderClient>
+      <AuthSessionProvider>
+        <NextUIProviderClient>{children}</NextUIProviderClient>
+      </AuthSessionProvider>
     </QueryProviders>
   );
 }
