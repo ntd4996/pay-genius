@@ -11,9 +11,15 @@ const config: Config = {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}',
   ],
+
   darkMode: 'class',
   theme: {
     extend: {
+      colors: {
+        primary: {
+          DEFAULT: '#ff6426',
+        },
+      },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic':
@@ -24,6 +30,14 @@ const config: Config = {
       },
       fontFamily: {
         astroSpace: ['AstroSpace', 'sans-serif'],
+      },
+      minHeight: {
+        'full-screen': 'calc(100vh - 64px)',
+        'full-content': 'calc(100vh - 64px - 64px)',
+        'card-message': 'calc(100vh - 64px - 64px - 286px - 286px - 28px)',
+      },
+      height: {
+        'card-message': 'calc(100vh - 64px - 64px - 286px - 286px - 28px)',
       },
     },
   },

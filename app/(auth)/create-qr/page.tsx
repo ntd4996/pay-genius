@@ -5,7 +5,7 @@ import CreateQR from '@/app/components/CreateQR';
 
 export default function Home() {
   return (
-    <div className='isolate mx-auto flex min-h-screen flex-col'>
+    <div className='isolate mx-auto flex min-h-full-screen flex-col'>
       <div
         className={cn('flex w-full flex-col', 'mx-auto max-w-screen-xl p-5')}
       >

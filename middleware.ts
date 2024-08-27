@@ -3,15 +3,22 @@ import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request: NextRequest) {
-  const token = await getToken({ req: request });
+  const path = request.nextUrl.pathname;
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
 
-  if (!token) {
-    return NextResponse.redirect(new URL(`/`, request.url));
+  const publicPaths = path === '/';
+
+  if (publicPaths && token) {
+    return NextResponse.redirect(new URL('/split-the-bill', request.nextUrl));
   }
-
-  return NextResponse.next();
+  if (!token && !publicPaths) {
+    return NextResponse.redirect(new URL(`/`, request.nextUrl));
+  }
 }
 
 export const config = {
-  matcher: '/split-the-bill/:path*',
+  matcher: ['/', '/split-the-bill/:path*', '/create-qr', '/split-the-bill'],
 };
