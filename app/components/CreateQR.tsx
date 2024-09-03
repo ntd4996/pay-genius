@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import {
   Autocomplete,
   AutocompleteItem,
@@ -15,6 +15,7 @@ import {
 import { DataBank } from '../data/bank';
 import axios from '../libs/axios';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import NumberInput from './NumberInput';
 
 export default function CreateQR() {
   const {
@@ -25,6 +26,7 @@ export default function CreateQR() {
   } = useForm({ mode: 'all' });
 
   const [listUsers, setListUsers] = useState<any[]>([]);
+  const [selectedKeyName, setSelectedKeyName] = useState<any>('');
 
   const [valueName, setValueName] = React.useState<string>('');
   const [valueBank, setValueBank] = React.useState<string>('');
@@ -33,13 +35,13 @@ export default function CreateQR() {
   const [valueAmount, setValueAmount] = React.useState<string>('');
   const [selectedKeyBank, setSelectedKeyBank] = React.useState<any>('');
 
-  const { isLoading } = useQuery({
-    queryKey: [`get-users-acc`],
-    queryFn: async () => {
-      const result = await axios(`/api/get-user`);
-      const arrayResult = result.data.map((item: any) => {
+  const { mutate: getAccounts, isPending } = useMutation({
+    mutationFn: async () => {
+      const response = await axios(`/api/accounts`);
+      const result = response.data.accounts;
+      const arrayResult = result.map((item: any) => {
         const matchingDataBank = DataBank.find(
-          (bank) => bank.label === item.code_bank
+          (bank) => bank.label === item.codeBank
         );
         return {
           ...item,
@@ -49,23 +51,35 @@ export default function CreateQR() {
           },
         };
       });
-      setListUsers(arrayResult);
       return arrayResult;
     },
+    onSuccess: (data) => {
+      if (data.length > 0) {
+        setListUsers(data);
+      }
+    },
+    onError: (e) => {
+      toast.error('Có lỗi xảy ra');
+    },
   });
+
+  useEffect(() => {
+    getAccounts();
+  }, [getAccounts]);
 
   const onSelectionChange = (key: React.Key) => {
     if (key) {
       const matchingDataBank = listUsers.find(
-        (user) => user.id.toString() === key
+        (user) => user.name.toString() === key
       );
       if (matchingDataBank) {
-        setValue('bank', matchingDataBank.code_bank);
-        setValue('accountNumber', matchingDataBank.account_number);
+        setValue('bank', matchingDataBank.dataBank.label);
+        setValue('accountNumber', matchingDataBank.accountNumber);
         setValueBank(matchingDataBank.dataBank.label);
-        setValueAccountNumber(matchingDataBank.account_number);
+        setValueAccountNumber(matchingDataBank.accountNumber);
         setSelectedKeyBank(matchingDataBank.dataBank.label);
       }
+      setSelectedKeyName(key);
     }
   };
 
@@ -80,8 +94,8 @@ export default function CreateQR() {
   ) => {
     setValueAccountNumber(event.target.value);
   };
-  const onInputChangeAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValueAmount(event.target.value);
+  const onInputChangeAmount = (event: string) => {
+    setValueAmount(event);
   };
 
   const onSelectionChangeBank = (key: React.Key) => {
@@ -110,15 +124,17 @@ export default function CreateQR() {
                   allowsCustomValue={true}
                   errorMessage={errors.name && 'Trường này là bắt buộc'}
                   isInvalid={!!errors.name}
-                  isLoading={isLoading}
+                  isLoading={isPending}
                   onSelectionChange={onSelectionChange}
                   onInputChange={onInputChange}
+                  selectedKey={selectedKeyName}
                   isRequired
+                  onKeyDown={(e: any) => e.continuePropagation()}
                 >
                   {(item) => (
                     <AutocompleteItem
-                      key={item.id}
-                      value={item.id}
+                      key={item.name}
+                      value={item.name}
                       textValue={item.label}
                     >
                       <div className='flex items-center gap-2'>
@@ -200,19 +216,13 @@ export default function CreateQR() {
                   value={valueAccountNumber}
                 />
 
-                <Input
-                  {...register('amount', {
-                    required: true,
-                  })}
-                  type='number'
-                  isRequired
+                <NumberInput
                   label='Số tiền'
-                  variant='bordered'
-                  isInvalid={!!errors.amount}
-                  errorMessage={errors.amount && 'Trường này là bắt buộc'}
-                  className='max-w-lg'
-                  onChange={onInputChangeAmount}
                   value={valueAmount}
+                  onChange={(e) => {
+                    onInputChangeAmount(e ?? '');
+                  }}
+                  className='max-w-lg'
                 />
               </div>
             </div>

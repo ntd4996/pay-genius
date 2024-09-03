@@ -58,10 +58,10 @@ export default function SplitTheBill({
 
   const isReadOnly = () => {
     if (dataBill?._id) {
-      if (
-        dataBill?.createBy !== data?.user?.email ||
-        data?.user?.email !== 'ntd4996@gmail.com'
-      ) {
+      if (data?.user?.email === 'ntd4996@gmail.com') {
+        return false;
+      }
+      if (dataBill?.createBy !== data?.user?.email) {
         return true;
       } else {
         return false;
