@@ -291,7 +291,7 @@ export default function SplitTheBill({
       })
       .join('\n');
 
-    const bottom1 = `##### *Bạn có thể chỉnh sửa và theo dõi thông tin hóa đơn tại: [Link](${window.location.protocol}${window.location.host}/split-the-bill/${id}) :datnt:*`;
+    const bottom1 = `##### *Bạn có thể chỉnh sửa và theo dõi thông tin hóa đơn tại: [Link](${window.location.protocol}//${window.location.host}/split-the-bill/${id}) :datnt:*`;
 
     const bottom2 = `##### *Tổng số tiền sau khi thanh toán toàn bộ nhận được: ${formatCurrencyVND(
       Math.round(parseInt(sumTotalBill())) || 0
