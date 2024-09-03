@@ -51,7 +51,9 @@ export async function PUT(
     await connect();
     const id = params.id;
 
+    const updateAt = new Date().toISOString();
     const { ...data } = await req.json();
+    data.updateAt = updateAt;
     const bill = await Bill.findByIdAndUpdate(id, data, { new: true });
 
     return NextResponse.json(
