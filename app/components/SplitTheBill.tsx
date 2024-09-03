@@ -297,7 +297,7 @@ export default function SplitTheBill({
       Math.round(parseInt(sumTotalBill())) || 0
     )} :ohhhh:*`;
 
-    const markdownTable = `\n${headerMarkdown}\n${separatorMarkdown}\n${bodyMarkdown}\n\n${bottom1}\n\n${bottom2}`;
+    const markdownTable = `${bottom1}\n\n${bottom2}\n\n${headerMarkdown}\n${separatorMarkdown}\n${bodyMarkdown}\n\n${bottom1}\n\n${bottom2}`;
 
     return markdownTable;
   };
