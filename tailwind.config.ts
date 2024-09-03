@@ -19,6 +19,9 @@ const config: Config = {
         primary: {
           DEFAULT: '#ff6426',
         },
+        secondary: {
+          DEFAULT: '#405484',
+        },
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
@@ -32,12 +35,12 @@ const config: Config = {
         astroSpace: ['AstroSpace', 'sans-serif'],
       },
       minHeight: {
-        'full-screen': 'calc(100vh - 64px)',
-        'full-content': 'calc(100vh - 64px - 64px)',
-        'card-message': 'calc(100vh - 64px - 64px - 286px - 286px - 28px)',
+        'full-screen': 'calc(100vh - 70px)',
+        'full-content': 'calc(100vh - 70px - 64px)',
+        'card-message': '400px',
       },
       height: {
-        'card-message': 'calc(100vh - 64px - 64px - 286px - 286px - 28px)',
+        'card-message': '400px',
       },
     },
   },

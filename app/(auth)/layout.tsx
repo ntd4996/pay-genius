@@ -3,6 +3,8 @@ import { useSession } from 'next-auth/react';
 import Header from '../components/Header';
 import Lottie from 'react-lottie';
 import LoadingJson from '../components/lotties/json/loading.json';
+import { useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 export default function DashboardLayout({
   children,
@@ -22,14 +24,8 @@ export default function DashboardLayout({
               preserveAspectRatio: 'xMidYMid slice',
             },
           }}
-          height={40}
-          width={40}
-          style={{
-            width: '200px',
-            height: '200px',
-            margin: '0',
-            minWidth: '200px',
-          }}
+          width={200}
+          height={200}
         />
       </div>
     );

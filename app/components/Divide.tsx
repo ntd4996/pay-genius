@@ -417,7 +417,6 @@ export default function Divide() {
 
   return (
     <Card>
-      <ToastContainer />
       <CardBody className='w-full p-8'>
         <div className='flex w-full flex-col justify-start gap-14 lg:flex-row'>
           <div className='flex w-full flex-col gap-4'>

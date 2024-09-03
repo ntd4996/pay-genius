@@ -7,10 +7,11 @@ interface TypeProps {
   onChange: (e: string | undefined | null) => void;
   value?: string;
   className?: string;
+  isDisabled?: boolean;
 }
 
 export default function NumberInput(props: TypeProps) {
-  const { label, value, onChange, className } = props;
+  const { label, value, onChange, className, isDisabled } = props;
   return (
     <div
       className={cn(
@@ -32,6 +33,7 @@ export default function NumberInput(props: TypeProps) {
             onChange(value);
           }}
           className='w-full bg-transparent pt-[20px] text-small font-normal !outline-none placeholder:text-foreground-500 focus:outline-none focus-visible:outline-none data-[has-end-content=true]:pe-1.5 data-[has-start-content=true]:ps-1.5'
+          disabled={isDisabled}
         />
         <div className='pointer-events-none flex items-center'>
           <span className='text-small text-default-400'>₫</span>

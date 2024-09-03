@@ -66,7 +66,6 @@ export default function DivideByEachPerson() {
     queryKey: [`get-users`],
     queryFn: async () => {
       const result = await axios(`/api/get-user`);
-      console.log('🚀 ~ result:', result.data);
       return result.data;
     },
   });
@@ -150,7 +149,6 @@ export default function DivideByEachPerson() {
     formState: { errors },
   } = useForm({ mode: 'all' });
   const onSubmit = async (data: any) => {
-    console.log(data);
     const isTotalAmountEqual = checkTotalAmountEqual(
       data.totalBill,
       listTransferPerson
@@ -214,7 +212,6 @@ export default function DivideByEachPerson() {
 
   return (
     <Card>
-      <ToastContainer />
       <CardBody>
         <div className='flex w-full flex-col justify-start gap-14 lg:flex-row'>
           <div className='flex min-w-fit flex-col gap-4 lg:max-w-xs'>

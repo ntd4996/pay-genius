@@ -5,6 +5,8 @@ import {
   ChipProps,
   cn,
   Image,
+  Input,
+  Pagination,
   Table,
   TableBody,
   TableCell,
@@ -13,8 +15,8 @@ import {
   TableRow,
 } from '@nextui-org/react';
 import { useSession } from 'next-auth/react';
-import { useCallback, useEffect } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useCallback, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import axios from '@/app/libs/axios';
 import PlantOne from '@/app/assets/svg/plans/PlantOne';
 import PlantFive from '@/app/assets/svg/plans/PlantFive';
@@ -30,6 +32,15 @@ import dayjs from 'dayjs';
 import NoData from '@/app/components/lotties/json/no-data.json';
 import Lottie from 'react-lottie';
 import { useRouter } from 'next/navigation';
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalTrigger,
+} from '@/app/components/ui/animated-modal';
+import TrashBin from '@/app/assets/svg/TrashBin';
+import { SearchIcon } from '@/app/assets/svg/SearchIcon';
 
 const statusColorMap: Record<string, ChipProps['color']> = {
   success: 'success',
@@ -40,19 +51,49 @@ export default function Home() {
   const { data: session } = useSession();
   const name = session?.user?.name;
   const router = useRouter();
+  const [listData, setListData] = useState([]);
+  const [totalBill, setTotalBill] = useState(0);
+  const [totalBillSuccess, setTotalBillSuccess] = useState(0);
+  const [totalBillUnSuccess, setTotalBillUnSuccess] = useState(0);
+  const [page, setPage] = useState(1);
+  const [filterValue, setFilterValue] = useState('');
 
-  // const { mutate: postData } = useMutation({
-  //   mutationFn: async () => {
-  //     const response = await axios.get(`/api/auth/me`);
-  //     return response;
-  //   },
-  //   onSuccess: (data) => {},
-  //   onError: (e) => {},
-  // });
+  const { isLoading, refetch } = useQuery({
+    queryKey: [`get-list-bill`, page],
+    queryFn: async () => {
+      const result = await axios('/api/bill?page=' + page);
+      const data = result.data;
+      setTotalBill(data.totalBills ? parseInt(data.totalBills) : 0);
+      setTotalBillSuccess(data.totalChecked ? parseInt(data.totalChecked) : 0);
+      setTotalBillUnSuccess(
+        data.totalUnChecked ? parseInt(data.totalUnChecked) : 0
+      );
+      const arrayResult = data.bills.map((item: any) => {
+        const isSuccess = item.listTransferPerson.every(
+          (person: any) => person.checked
+        );
+        item.isSuccess = isSuccess;
+        return item;
+      });
+      setListData(arrayResult);
+      return arrayResult;
+    },
+  });
 
-  // useEffect(() => {
-  //   postData();
-  // }, []);
+  const onSearchChange = useCallback((value?: string) => {
+    if (value) {
+      setFilterValue(value);
+      setPage(1);
+    } else {
+      setFilterValue('');
+      setPage(1);
+    }
+  }, []);
+
+  const onClear = useCallback(() => {
+    setFilterValue('');
+    setPage(1);
+  }, []);
 
   const renderStatus = (status: string) => {
     switch (status) {
@@ -96,70 +137,92 @@ export default function Home() {
   };
 
   const renderCell = useCallback((data: any, columnKey: React.Key) => {
-    return '123';
-    // const cellValue = user[columnKey as keyof User];
+    switch (columnKey) {
+      case '$.0':
+        return data.nameBill;
+      case '$.1':
+        return formatCurrency(
+          Math.round(parseInt(sumTotalBill(data.listTransferPerson))) || 0
+        );
+      case '$.2':
+        const status = data.isSuccess ? 'success' : 'unsuccessful';
+        return renderStatus(status);
+      case '$.3':
+        return formatDate(data.createdAt);
 
-    // switch (columnKey) {
-    //   case 'name':
-    //     return (
-    //       <User
-    //         avatarProps={{ radius: 'lg', src: user.avatar }}
-    //         description={user.email}
-    //         name={cellValue}
-    //       >
-    //         {user.email}
-    //       </User>
-    //     );
-    //   case 'role':
-    //     return (
-    //       <div className='flex flex-col'>
-    //         <p className='text-bold text-small capitalize'>{cellValue}</p>
-    //         <p className='text-bold text-tiny capitalize text-default-400'>
-    //           {user.team}
-    //         </p>
-    //       </div>
-    //     );
-    //   case 'status':
-    //     return (
-    //       <Chip
-    //         className='capitalize'
-    //         color={statusColorMap[user.status]}
-    //         size='sm'
-    //         variant='flat'
-    //       >
-    //         {cellValue}
-    //       </Chip>
-    //     );
-    //   case 'actions':
-    //     return (
-    //       <div className='relative flex items-center justify-end gap-2'>
-    //         <Dropdown>
-    //           <DropdownTrigger>
-    //             <Button isIconOnly size='sm' variant='light'>
-    //               <VerticalDotsIcon className='text-default-300' />
-    //             </Button>
-    //           </DropdownTrigger>
-    //           <DropdownMenu>
-    //             <DropdownItem>View</DropdownItem>
-    //             <DropdownItem>Edit</DropdownItem>
-    //             <DropdownItem>Delete</DropdownItem>
-    //           </DropdownMenu>
-    //         </Dropdown>
-    //       </div>
-    //     );
-    //   default:
-    //     return cellValue;
-    // }
+      default:
+        return (
+          <div className='flex items-center justify-center gap-2'>
+            <div
+              className='text-center'
+              onClick={() => {
+                redirectToDetail(data._id);
+              }}
+            >
+              <Edit className='cursor-pointer hover:text-primary' />
+            </div>
+            <Modal>
+              <ModalTrigger>
+                <div>
+                  <TrashBin className='h-5 w-5 cursor-pointer text-[#191a1f] hover:text-danger' />
+                </div>
+              </ModalTrigger>
+
+              <ModalBody>
+                <ModalContent>
+                  <div className='text-center text-lg'>
+                    Bạn có chắc chắn muốn xóa hóa đơn này không?
+                  </div>
+                </ModalContent>
+                <ModalFooter
+                  className='gap-4'
+                  id={data._id}
+                  refetch={refetch}
+                />
+              </ModalBody>
+            </Modal>
+          </div>
+        );
+    }
   }, []);
 
   const redirectToCreate = () => {
     router.push('/split-the-bill/create');
   };
+  const redirectToDetail = (id: string) => {
+    router.push('/split-the-bill/' + id);
+  };
+
+  const sumTotalBill = (listTransferPerson: any) => {
+    const sumValues = listTransferPerson.reduce((acc: any, objectData: any) => {
+      const partialSum = Object.entries(objectData).reduce(
+        (subtotal, [key, value]: any) => {
+          if (
+            key !== 'mention' &&
+            key !== 'amount' &&
+            key !== 'discountAmount'
+          ) {
+            return subtotal + Math.round(parseFloat(value) || 0);
+          }
+          return subtotal;
+        },
+        0
+      );
+      return acc + partialSum;
+    }, 0);
+    return sumValues;
+  };
+  const pages = useMemo(() => {
+    return totalBill ? Math.ceil(totalBill / 10) : 0;
+  }, [totalBill]);
 
   return (
     <div className='isolate mx-auto flex min-h-full-screen flex-col'>
       <div
-        className={cn('flex w-full flex-col', 'mx-auto max-w-screen-2xl p-5')}
+        className={cn(
+          'flex w-full flex-col',
+          'mx-auto max-w-screen-2xl px-5 pb-5 pt-3'
+        )}
       >
         <div className='flex w-full flex-col '>
           <div className='flex min-h-full-content gap-6'>
@@ -173,20 +236,47 @@ export default function Home() {
                     <ShinyButton text='tạo hóa đơn' className='px-6 py-3' />
                   </div>
                 </div>
+
+                <Input
+                  isClearable
+                  className='w-full sm:max-w-[38%]'
+                  placeholder='Tìm kiếm theo tên...'
+                  startContent={<SearchIcon />}
+                  variant='bordered'
+                  value={filterValue}
+                  onClear={() => onClear()}
+                  onValueChange={onSearchChange}
+                />
                 <Table
                   isCompact
                   removeWrapper
                   classNames={{
                     th: 'bg-[#f4f4f4] uppercase text-[#191a1f] font-semibold',
                     tr: 'hover:bg-[#f4f4f4] h-[50px] rounded-3xl',
+                    tbody: 'min-h-[300px]',
                   }}
+                  bottomContent={
+                    pages > 1 ? (
+                      <div className='flex w-full justify-center'>
+                        <Pagination
+                          isCompact
+                          showControls
+                          showShadow
+                          color='primary'
+                          page={page}
+                          total={pages}
+                          onChange={(page) => setPage(page)}
+                        />
+                      </div>
+                    ) : null
+                  }
                 >
                   <TableHeader>
                     <TableColumn>Tên hóa đơn</TableColumn>
-                    <TableColumn>Tổng số tiền</TableColumn>
-                    <TableColumn>Trạng thái</TableColumn>
-                    <TableColumn>Ngày Tạo</TableColumn>
-                    <TableColumn>&nbsp;</TableColumn>
+                    <TableColumn width={180}>Tổng số tiền</TableColumn>
+                    <TableColumn width={120}>Trạng thái</TableColumn>
+                    <TableColumn width={150}>Ngày Tạo</TableColumn>
+                    <TableColumn width={120}>&nbsp;</TableColumn>
                   </TableHeader>
                   <TableBody
                     emptyContent={
@@ -200,44 +290,21 @@ export default function Home() {
                               preserveAspectRatio: 'xMidYMid slice',
                             },
                           }}
-                          height={40}
-                          width={40}
-                          style={{
-                            width: '400px',
-                            height: '400px',
-                            margin: '0',
-                            minWidth: '200px',
-                          }}
+                          width={400}
+                          height={400}
                         />
                       </div>
                     }
-                    items={[] as any}
+                    items={listData}
+                    isLoading={isLoading}
                   >
                     {(item: any) => (
-                      <TableRow key={item.id}>
+                      <TableRow key={item._id}>
                         {(columnKey) => (
                           <TableCell>{renderCell(item, columnKey)}</TableCell>
                         )}
                       </TableRow>
                     )}
-                    {/* <TableRow key='1'>
-                      <TableCell>Thành Đạt Nguyễn</TableCell>
-                      <TableCell>{formatCurrency(200000)}</TableCell>
-                      <TableCell>{renderStatus('unsuccessful')}</TableCell>
-                      <TableCell>{formatDate(dayjs().format())}</TableCell>
-                      <TableCell>
-                        <Edit className='cursor-pointer hover:text-primary' />
-                      </TableCell>
-                    </TableRow>
-                    <TableRow key='2'>
-                      <TableCell>Tony Reichert</TableCell>
-                      <TableCell>{formatCurrency(140000)}</TableCell>
-                      <TableCell>{renderStatus('success')}</TableCell>
-                      <TableCell>Active</TableCell>
-                      <TableCell className='text-center'>
-                        <Edit className='cursor-pointer hover:text-primary' />
-                      </TableCell>
-                    </TableRow> */}
                   </TableBody>
                 </Table>
               </div>
@@ -278,15 +345,17 @@ export default function Home() {
                   <div className='flex items-center gap-2 text-xl'>
                     <BankNotes className='text-primary-500' />
                     <div>
-                      Bạn đã tạo <span className='text-3xl'>0</span> hóa đơn
+                      Bạn đã tạo <span className='text-3xl'>{totalBill}</span>{' '}
+                      hóa đơn
                     </div>
                   </div>
                   <div className='text-xl'>
                     <div className='flex items-center gap-2 text-xl'>
                       <CheckBadge className='text-success-500' />
                       <div>
-                        Đã có <span className='text-3xl'>0</span> hóa đơn đã
-                        hoàn thành
+                        Đã có{' '}
+                        <span className='text-3xl'>{totalBillSuccess}</span> hóa
+                        đơn đã hoàn thành
                       </div>
                     </div>
                   </div>
@@ -295,8 +364,9 @@ export default function Home() {
                     <div className='flex items-center gap-2 text-xl'>
                       <Clock className='text-primary' />
                       <div>
-                        Còn <span className='text-3xl'>0</span> hóa đơn chưa
-                        hoàn thành
+                        Còn{' '}
+                        <span className='text-3xl'>{totalBillUnSuccess}</span>{' '}
+                        hóa đơn chưa hoàn thành
                       </div>
                     </div>
                   </div>
@@ -309,7 +379,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className='relative flex h-card-message  flex-col gap-6 overflow-hidden rounded-3xl border px-4 py-10'>
+              <div className='relative flex max-h-[640px] min-h-[500px] flex-1  flex-col gap-6 overflow-hidden rounded-3xl border px-4 py-6'>
                 <AnimatedListExport />
               </div>
             </div>

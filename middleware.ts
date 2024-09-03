@@ -15,7 +15,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/split-the-bill', request.nextUrl));
   }
   if (!token && !publicPaths) {
-    return NextResponse.redirect(new URL(`/`, request.nextUrl));
+    const currentUrl = request.nextUrl.toString();
+    const redirectUrl = new URL('/', request.nextUrl.origin);
+    redirectUrl.searchParams.set('currentUrl', currentUrl);
+    return NextResponse.redirect(redirectUrl);
   }
 }
 

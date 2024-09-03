@@ -43,6 +43,7 @@ export default function Header() {
       maxWidth='2xl'
       className='bg-[#f4f4f4]'
       position='static'
+      height={'70px'}
     >
       <NavbarContent>
         <NavbarMenuToggle

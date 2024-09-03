@@ -1,12 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@nextui-org/react';
 import { signIn, useSession } from 'next-auth/react';
 import { Boxes } from './components/ui/background-boxes';
 import { BackgroundGradient } from './components/ui/background-gradient';
 import LogoGoogle from './assets/svg/LogoGoogle';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function Login() {
   const { data: session } = useSession();
@@ -16,9 +16,13 @@ export default function Login() {
   if (session && session.user) {
     router.push('/split-the-bill');
   }
+  const searchParams = useSearchParams();
+  const currentUrl = searchParams.get('currentUrl');
 
   const login = () => {
-    signIn('google', { callbackUrl: '/split-the-bill' });
+    signIn('google', {
+      callbackUrl: currentUrl ? currentUrl : '/split-the-bill',
+    });
   };
 
   return (
