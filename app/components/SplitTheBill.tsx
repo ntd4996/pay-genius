@@ -242,7 +242,7 @@ export default function SplitTheBill({
     return formattedAmount;
   };
 
-  const convertTableToMarkdown = (): string => {
+  const convertTableToMarkdown = (id: string): string => {
     const initHeaderTable = [...headerTable];
     const updatedHeader = initHeaderTable.filter(
       (item) =>
@@ -291,9 +291,7 @@ export default function SplitTheBill({
       })
       .join('\n');
 
-    const bottom1 = `##### *Bạn có thể chỉnh sửa và theo dõi thông tin hóa đơn tại: ${formatCurrencyVND(
-      Math.round(parseInt(sumTotalBill())) || 0
-    )} :datnt:*`;
+    const bottom1 = `##### *Bạn có thể chỉnh sửa và theo dõi thông tin hóa đơn tại: [Link](${window.location.protocol}${window.location.host}/split-the-bill/${id}) :datnt:*`;
 
     const bottom2 = `##### *Tổng số tiền sau khi thanh toán toàn bộ nhận được: ${formatCurrencyVND(
       Math.round(parseInt(sumTotalBill())) || 0
@@ -443,9 +441,10 @@ export default function SplitTheBill({
       const response = await axios.post('/api/bill', data);
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('🚀 ~ data:', data);
       router.push('/split-the-bill/');
-      const markdownTable = convertTableToMarkdown();
+      const markdownTable = convertTableToMarkdown(data.bill._id);
       navigator.clipboard.writeText(markdownTable).then(() => {
         setCopied(true);
         toast.success('Copy markdown thành công');
@@ -462,8 +461,9 @@ export default function SplitTheBill({
       const response = await axios.put(`/api/bill/${id}`, data);
       return response.data;
     },
-    onSuccess: () => {
-      const markdownTable = convertTableToMarkdown();
+    onSuccess: (data) => {
+      console.log('🚀 ~ data:', data);
+      const markdownTable = convertTableToMarkdown(data.bill._id);
       navigator.clipboard.writeText(markdownTable).then(() => {
         setCopied(true);
         toast.success('Đã cập nhật và Copy markdown thành công');
