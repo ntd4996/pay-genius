@@ -17,6 +17,10 @@ const billSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  status: {
+    type: String,
+    required: true,
+  },
   shipping: {
     type: String,
     required: false,

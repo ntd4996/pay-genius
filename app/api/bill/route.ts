@@ -1,6 +1,5 @@
 import { connect } from '@/utils/config/dbConfig';
 import Bill from '@/utils/models/bill';
-import { create } from 'domain';
 import { getToken } from 'next-auth/jwt';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -24,6 +23,7 @@ export async function POST(request: NextRequest) {
       amountDiscount,
       listTransferPerson,
       nameBill,
+      status,
     } = await request.json();
 
     await connect();
@@ -37,6 +37,7 @@ export async function POST(request: NextRequest) {
       headerTable,
       amountDiscount,
       listTransferPerson,
+      status,
       createBy: token.email,
     });
     const res = await newBill.save();
@@ -69,19 +70,38 @@ export async function GET(request: NextRequest) {
     const page = parseInt(request.nextUrl.searchParams.get('page') ?? '1') || 1;
     const limit = 10;
     const skip = (page - 1) * limit;
-    const listBills = await Bill.find({ createBy: token.email })
+
+    const search = request.nextUrl.searchParams.get('search') || '';
+    const searchCondition = search
+      ? { nameBill: { $regex: search, $options: 'i' } }
+      : {};
+
+    const statusFilter = new Set(request.nextUrl.searchParams.getAll('status'));
+    const statusCondition =
+      statusFilter.size > 0
+        ? { status: { $in: Array.from(statusFilter) } }
+        : {};
+    const listBills = await Bill.find({
+      createBy: token.email,
+      ...searchCondition,
+      ...statusCondition,
+    })
       .sort({
         createdAt: -1,
       })
       .skip(skip)
       .limit(limit);
 
-    const totalBills = await Bill.countDocuments({ createBy: token.email });
+    const totalBills = await Bill.countDocuments({
+      createBy: token.email,
+    });
+
+    const allBills = await Bill.find({ createBy: token.email });
 
     let totalChecked = 0;
     let totalUnChecked = 0;
 
-    listBills.forEach((bill) => {
+    allBills.forEach((bill) => {
       const isSuccess = bill.listTransferPerson.every(
         (person: any) => person.checked
       );

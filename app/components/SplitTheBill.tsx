@@ -423,7 +423,14 @@ export default function SplitTheBill({
       amountDiscount,
       shipping,
       listTransferPerson,
+      status: 'unSuccess',
     };
+    const isSuccess = listTransferPerson.every((person: any) => person.checked);
+    if (!isSuccess) {
+      body.status = 'unSuccess';
+    } else {
+      body.status = 'success';
+    }
     if (isCreate) {
       await createBill(body);
     } else {

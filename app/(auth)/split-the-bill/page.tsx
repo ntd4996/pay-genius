@@ -1,12 +1,19 @@
 'use client';
 
 import {
+  Button,
   Chip,
   ChipProps,
   cn,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
   Image,
   Input,
   Pagination,
+  Selection,
+  Spinner,
   Table,
   TableBody,
   TableCell,
@@ -16,7 +23,7 @@ import {
 } from '@nextui-org/react';
 import { useSession } from 'next-auth/react';
 import { useCallback, useMemo, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import axios from '@/app/libs/axios';
 import PlantOne from '@/app/assets/svg/plans/PlantOne';
 import PlantFive from '@/app/assets/svg/plans/PlantFive';
@@ -46,6 +53,11 @@ const statusColorMap: Record<string, ChipProps['color']> = {
   success: 'success',
   unsuccessful: 'warning',
 };
+import { useDebounce } from 'use-debounce';
+import { ChevronDownIcon } from '@/app/assets/svg/ChevronDownIcon';
+import { statusOptions } from '@/app/data/status';
+
+const DEBOUNCE_MS = 300;
 
 export default function Home() {
   const { data: session } = useSession();
@@ -57,27 +69,29 @@ export default function Home() {
   const [totalBillUnSuccess, setTotalBillUnSuccess] = useState(0);
   const [page, setPage] = useState(1);
   const [filterValue, setFilterValue] = useState('');
+  const [debouncedQuery] = useDebounce(filterValue, DEBOUNCE_MS);
+  const [statusFilter, setStatusFilter] = useState<Selection>('all');
+  const [key, setKey] = useState(0);
 
   const { isLoading, refetch } = useQuery({
-    queryKey: [`get-list-bill`, page],
+    queryKey: [`get-list-bill`, page, debouncedQuery, key],
     queryFn: async () => {
-      const result = await axios('/api/bill?page=' + page);
+      let url = '/api/bill?page=' + page + '&search=' + debouncedQuery;
+      if (statusFilter !== 'all' && Array.from(statusFilter).length <= 1) {
+        url += '&status=' + Array.from(statusFilter).join(',');
+      }
+      const result = await axios(url);
       const data = result.data;
       setTotalBill(data.totalBills ? parseInt(data.totalBills) : 0);
       setTotalBillSuccess(data.totalChecked ? parseInt(data.totalChecked) : 0);
       setTotalBillUnSuccess(
         data.totalUnChecked ? parseInt(data.totalUnChecked) : 0
       );
-      const arrayResult = data.bills.map((item: any) => {
-        const isSuccess = item.listTransferPerson.every(
-          (person: any) => person.checked
-        );
-        item.isSuccess = isSuccess;
-        return item;
-      });
-      setListData(arrayResult);
-      return arrayResult;
+      setListData(data.bills ?? []);
+      return data.bills;
     },
+    staleTime: DEBOUNCE_MS,
+    placeholderData: keepPreviousData,
   });
 
   const onSearchChange = useCallback((value?: string) => {
@@ -97,7 +111,7 @@ export default function Home() {
 
   const renderStatus = (status: string) => {
     switch (status) {
-      case 'unsuccessful':
+      case 'unSuccess':
         return (
           <Chip
             className='capitalize'
@@ -145,8 +159,7 @@ export default function Home() {
           Math.round(parseInt(sumTotalBill(data.listTransferPerson))) || 0
         );
       case '$.2':
-        const status = data.isSuccess ? 'success' : 'unsuccessful';
-        return renderStatus(status);
+        return renderStatus(data.status);
       case '$.3':
         return formatDate(data.createdAt);
 
@@ -225,7 +238,7 @@ export default function Home() {
         )}
       >
         <div className='flex w-full flex-col '>
-          <div className='flex min-h-full-content gap-6'>
+          <div className='flex min-h-full-content flex-col gap-6 lg:flex-row'>
             <div className='flex flex-1 flex-col gap-6 rounded-3xl bg-[#FEFEFE] p-4'>
               <Image src={'/images/banner.png'} alt='banner' height={300} />
 
@@ -236,17 +249,51 @@ export default function Home() {
                     <ShinyButton text='tạo hóa đơn' className='px-6 py-3' />
                   </div>
                 </div>
+                <div className='flex items-center gap-4'>
+                  <Input
+                    isClearable
+                    className='w-full sm:max-w-[38%]'
+                    placeholder='Tìm kiếm theo tên...'
+                    startContent={<SearchIcon />}
+                    variant='bordered'
+                    value={filterValue}
+                    onClear={() => onClear()}
+                    onValueChange={onSearchChange}
+                  />
+                  <Dropdown>
+                    <DropdownTrigger className='hidden sm:flex'>
+                      <Button
+                        endContent={<ChevronDownIcon className='text-small' />}
+                        variant='flat'
+                        color='primary'
+                      >
+                        Trạng thái
+                      </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu
+                      disallowEmptySelection
+                      aria-label='Table Columns'
+                      closeOnSelect={false}
+                      selectedKeys={statusFilter}
+                      selectionMode='multiple'
+                      onSelectionChange={(e) => {
+                        setStatusFilter(e);
+                        setKey(Math.random());
+                      }}
+                    >
+                      {statusOptions.map((status) => (
+                        <DropdownItem
+                          value={status.uid}
+                          key={status.uid}
+                          className='capitalize'
+                        >
+                          {status.name}
+                        </DropdownItem>
+                      ))}
+                    </DropdownMenu>
+                  </Dropdown>
+                </div>
 
-                <Input
-                  isClearable
-                  className='w-full sm:max-w-[38%]'
-                  placeholder='Tìm kiếm theo tên...'
-                  startContent={<SearchIcon />}
-                  variant='bordered'
-                  value={filterValue}
-                  onClear={() => onClear()}
-                  onValueChange={onSearchChange}
-                />
                 <Table
                   isCompact
                   removeWrapper
@@ -312,7 +359,7 @@ export default function Home() {
 
             <div
               className={cn(
-                'w-1/3 rounded-3xl bg-[#FEFEFE] p-4',
+                'w-full rounded-3xl bg-[#FEFEFE] p-4 lg:w-1/3',
                 'flex flex-col gap-6'
               )}
             >
