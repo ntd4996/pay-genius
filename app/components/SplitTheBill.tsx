@@ -246,7 +246,6 @@ export default function SplitTheBill({
     const initHeaderTable = [...headerTable];
     const updatedHeader = initHeaderTable.filter(
       (item) =>
-        item.label !== 'Đã thanh toán' &&
         item.label !== 'Xóa' &&
         item.label !== 'Số tiền' &&
         item.label !== 'Số tiền được giảm giá'
@@ -265,6 +264,8 @@ export default function SplitTheBill({
         return `| ${updatedHeader
           .map((header: any, indexColumn) => {
             switch (header.label) {
+              case 'Đã thanh toán':
+                return person.checked ? ':white_check_mark:' : ':o:';
               case '@':
                 return person.mention;
               case 'Số tiền':
@@ -442,7 +443,6 @@ export default function SplitTheBill({
       return response.data;
     },
     onSuccess: (data) => {
-      console.log('🚀 ~ data:', data);
       router.push('/split-the-bill/');
       const markdownTable = convertTableToMarkdown(data.bill._id);
       navigator.clipboard.writeText(markdownTable).then(() => {
@@ -462,7 +462,6 @@ export default function SplitTheBill({
       return response.data;
     },
     onSuccess: (data) => {
-      console.log('🚀 ~ data:', data);
       const markdownTable = convertTableToMarkdown(data.bill._id);
       navigator.clipboard.writeText(markdownTable).then(() => {
         setCopied(true);
