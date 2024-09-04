@@ -26,16 +26,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <QueryProviders>
-      <AuthSessionProvider>
-        <GoogleAnalytics gaId='G-J3V3B1ZQY7' />
-        <NextUIProviderClient>
-          <div className={cn(nunito.className, 'text-[#191a1f]')}>
-            <ToastContainer />
-            {children}
-          </div>
-        </NextUIProviderClient>
-      </AuthSessionProvider>
-    </QueryProviders>
+    <body suppressHydrationWarning={true}>
+      <QueryProviders>
+        <AuthSessionProvider>
+          <GoogleAnalytics gaId='G-J3V3B1ZQY7' />
+          <NextUIProviderClient>
+            <div className={cn(nunito.className, 'text-[#191a1f]')}>
+              <ToastContainer />
+              {children}
+            </div>
+          </NextUIProviderClient>
+        </AuthSessionProvider>
+      </QueryProviders>
+    </body>
   );
 }

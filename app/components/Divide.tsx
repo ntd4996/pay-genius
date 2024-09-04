@@ -612,6 +612,7 @@ export default function Divide() {
                               }}
                             />
                             <Button
+                              aria-hidden={false}
                               isIconOnly
                               color='danger'
                               aria-label='Like'
@@ -648,6 +649,7 @@ export default function Divide() {
                           return (
                             <td className='border-r ' key={indexColumn}>
                               <Button
+                                aria-hidden={false}
                                 isIconOnly
                                 color='danger'
                                 aria-label='Like'
@@ -772,6 +774,7 @@ export default function Divide() {
             </div>
             <div className='flex'>
               <Button
+                aria-hidden={false}
                 color='primary'
                 className='mt-4'
                 startContent={<PlusCircle />}
@@ -789,6 +792,7 @@ export default function Divide() {
 
           <div className='flex justify-between'>
             <Button
+              aria-hidden={false}
               color='primary'
               className='mt-4 max-w-fit'
               startContent={<PlusCircle />}
@@ -797,6 +801,7 @@ export default function Divide() {
               Thêm dòng
             </Button>
             <Button
+              aria-hidden={false}
               color='primary'
               className='mt-4 max-w-fit'
               onClick={copyScript}

@@ -150,61 +150,67 @@ export default function Home() {
     return dayjs(date).format('DD/MM/YYYY HH:mm');
   };
 
-  const renderCell = useCallback((data: any, columnKey: React.Key) => {
-    switch (columnKey) {
-      case '$.0':
-        return data.nameBill;
-      case '$.1':
-        return formatCurrency(
-          Math.round(parseInt(sumTotalBill(data.listTransferPerson))) || 0
-        );
-      case '$.2':
-        return renderStatus(data.status);
-      case '$.3':
-        return formatDate(data.createdAt);
-
-      default:
-        return (
-          <div className='flex items-center justify-center gap-2'>
-            <div
-              className='text-center'
-              onClick={() => {
-                redirectToDetail(data._id);
-              }}
-            >
-              <Edit className='cursor-pointer hover:text-primary' />
-            </div>
-            <Modal>
-              <ModalTrigger>
-                <div>
-                  <TrashBin className='h-5 w-5 cursor-pointer text-[#191a1f] hover:text-danger' />
-                </div>
-              </ModalTrigger>
-
-              <ModalBody>
-                <ModalContent>
-                  <div className='text-center text-lg'>
-                    Bạn có chắc chắn muốn xóa hóa đơn này không?
-                  </div>
-                </ModalContent>
-                <ModalFooter
-                  className='gap-4'
-                  id={data._id}
-                  refetch={refetch}
-                />
-              </ModalBody>
-            </Modal>
-          </div>
-        );
-    }
-  }, []);
-
-  const redirectToCreate = () => {
+  const redirectToCreate = useCallback(() => {
     router.push('/split-the-bill/create');
-  };
-  const redirectToDetail = (id: string) => {
-    router.push('/split-the-bill/' + id);
-  };
+  }, [router]);
+  const redirectToDetail = useCallback(
+    (id: string) => {
+      router.push('/split-the-bill/' + id);
+    },
+    [router]
+  );
+
+  const renderCell = useCallback(
+    (data: any, columnKey: React.Key) => {
+      switch (columnKey) {
+        case '$.0':
+          return data.nameBill;
+        case '$.1':
+          return formatCurrency(
+            Math.round(parseInt(sumTotalBill(data.listTransferPerson))) || 0
+          );
+        case '$.2':
+          return renderStatus(data.status);
+        case '$.3':
+          return formatDate(data.createdAt);
+
+        default:
+          return (
+            <div className='flex items-center justify-center gap-2'>
+              <div
+                className='text-center'
+                onClick={() => {
+                  redirectToDetail(data._id);
+                }}
+              >
+                <Edit className='cursor-pointer hover:text-primary' />
+              </div>
+              <Modal>
+                <ModalTrigger>
+                  <div>
+                    <TrashBin className='h-5 w-5 cursor-pointer text-[#191a1f] hover:text-danger' />
+                  </div>
+                </ModalTrigger>
+
+                <ModalBody>
+                  <ModalContent>
+                    <div className='text-center text-lg'>
+                      Bạn có chắc chắn muốn xóa hóa đơn này không?
+                    </div>
+                  </ModalContent>
+                  <ModalFooter
+                    className='gap-4'
+                    id={data._id}
+                    refetch={refetch}
+                  />
+                </ModalBody>
+              </Modal>
+            </div>
+          );
+      }
+    },
+    [redirectToDetail, refetch]
+  );
 
   const sumTotalBill = (listTransferPerson: any) => {
     const sumValues = listTransferPerson.reduce((acc: any, objectData: any) => {
@@ -252,6 +258,7 @@ export default function Home() {
                 <div className='flex items-center gap-4'>
                   <Input
                     isClearable
+                    aria-hidden={false}
                     className='w-full sm:max-w-[38%]'
                     placeholder='Tìm kiếm theo tên...'
                     startContent={<SearchIcon />}
@@ -260,7 +267,7 @@ export default function Home() {
                     onClear={() => onClear()}
                     onValueChange={onSearchChange}
                   />
-                  <Dropdown>
+                  <Dropdown aria-hidden={false}>
                     <DropdownTrigger className='hidden sm:flex'>
                       <Button
                         endContent={<ChevronDownIcon className='text-small' />}
@@ -272,7 +279,6 @@ export default function Home() {
                     </DropdownTrigger>
                     <DropdownMenu
                       disallowEmptySelection
-                      aria-label='Table Columns'
                       closeOnSelect={false}
                       selectedKeys={statusFilter}
                       selectionMode='multiple'
@@ -402,7 +408,7 @@ export default function Home() {
                       <div>
                         Đã có{' '}
                         <span className='text-3xl'>{totalBillSuccess}</span> hóa
-                        đơn đã hoàn thành
+                        đơn hoàn thành
                       </div>
                     </div>
                   </div>

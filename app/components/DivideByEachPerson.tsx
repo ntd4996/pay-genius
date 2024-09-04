@@ -493,9 +493,9 @@ export default function DivideByEachPerson() {
 
                     <div className='flex h-full items-center justify-center'>
                       <Button
+                        aria-hidden={false}
                         isIconOnly
                         color='danger'
-                        aria-label='Like'
                         isDisabled={listTransferPerson.length <= 1}
                         onClick={() => deletePerson(index)}
                       >
@@ -509,6 +509,7 @@ export default function DivideByEachPerson() {
 
             <div className='flex w-full justify-end'>
               <Button
+                aria-hidden={false}
                 color='primary'
                 startContent={<PlusCircle />}
                 onClick={addPerson}
@@ -522,7 +523,11 @@ export default function DivideByEachPerson() {
           Tổng số tiền thực nhận là: {sumPrice ?? 0} VNĐ
         </div>
         <div className='mt-4 flex w-full items-center justify-start'>
-          <Button color='primary' onClick={handleSubmit(onSubmit)}>
+          <Button
+            aria-hidden={false}
+            color='primary'
+            onClick={handleSubmit(onSubmit)}
+          >
             Cập nhật Review
           </Button>
         </div>
@@ -531,6 +536,7 @@ export default function DivideByEachPerson() {
           <div className='flex w-full items-center justify-between'>
             <div className='text-xl font-semibold'>Review</div>
             <Button
+              aria-hidden={false}
               color='primary'
               onClick={copyScript}
               startContent={copied ? <CheckIcon /> : <Copy />}

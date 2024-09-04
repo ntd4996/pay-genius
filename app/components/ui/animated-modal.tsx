@@ -208,6 +208,7 @@ export const ModalFooter = ({
       )}
     >
       <Button
+        aria-hidden={false}
         className={cn(classNameClose)}
         onClick={() => {
           setOpen(false);
@@ -218,6 +219,7 @@ export const ModalFooter = ({
       </Button>
 
       <Button
+        aria-hidden={false}
         className={cn(classNameClose)}
         onClick={() => {
           deleteBill();

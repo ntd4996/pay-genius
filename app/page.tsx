@@ -37,6 +37,7 @@ export default function Login() {
         </p>
 
         <Button
+          aria-hidden={false}
           className='group/btn relative z-20 flex h-[55px] w-full items-center justify-start space-x-2 rounded-md p-4 font-medium text-black shadow-input hover:bg-white'
           onClick={() => login()}
         >
