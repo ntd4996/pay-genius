@@ -253,8 +253,8 @@ export default function Home() {
                     onClear={() => onClear()}
                     onValueChange={onSearchChange}
                   />
-                  <Dropdown aria-hidden={false}>
-                    <DropdownTrigger className='hidden sm:flex'>
+                  <Dropdown>
+                    <DropdownTrigger className='flex'>
                       <Button
                         endContent={<ChevronDownIcon className='text-small' />}
                         variant='flat'
@@ -272,6 +272,7 @@ export default function Home() {
                         setStatusFilter(e);
                         setKey(Math.random());
                       }}
+                      aria-label='Static Actions'
                     >
                       {statusOptions.map((status) => (
                         <DropdownItem
