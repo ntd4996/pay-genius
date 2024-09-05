@@ -8,7 +8,7 @@ import NumberInput from '@/app/components/NumberInput';
 import { DataBank } from '@/app/data/bank';
 import { Mentions } from '@/app/data/mentions';
 import axios from '@/app/libs/axios';
-import { cn } from '@/lib/utils';
+import { cn, formatCurrencyVND, sumTotal, sumTotalBill } from '@/lib/utils';
 import {
   Autocomplete,
   AutocompleteItem,
@@ -200,48 +200,6 @@ export default function SplitTheBill({
     setListTransferPerson(newArray);
   };
 
-  const sumTotal = (index: any) => {
-    const objectData = listTransferPerson[index];
-    const sumValues = Object.entries(objectData).reduce(
-      (acc, [key, value]: any) => {
-        if (key !== 'mention' && key !== 'amount' && key !== 'discountAmount') {
-          return acc + Math.round(parseFloat(value) || 0);
-        }
-        return acc;
-      },
-      0
-    );
-    return sumValues;
-  };
-
-  const sumTotalBill = () => {
-    const sumValues = listTransferPerson.reduce((acc, objectData) => {
-      const partialSum = Object.entries(objectData).reduce(
-        (subtotal, [key, value]: any) => {
-          if (
-            key !== 'mention' &&
-            key !== 'amount' &&
-            key !== 'discountAmount'
-          ) {
-            return subtotal + Math.round(parseFloat(value) || 0);
-          }
-          return subtotal;
-        },
-        0
-      );
-      return acc + partialSum;
-    }, 0);
-    return sumValues;
-  };
-
-  const formatCurrencyVND = (amount: any) => {
-    const formattedAmount = amount.toLocaleString('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
-    });
-    return formattedAmount;
-  };
-
   const convertTableToMarkdown = (id: string): string => {
     const initHeaderTable = [...headerTable];
     const updatedHeader = initHeaderTable.filter(
@@ -277,9 +235,10 @@ export default function SplitTheBill({
               case 'Tiền sau khi giảm':
                 return formatCurrencyVND(person.moneyAfterReduction);
               case 'Tổng Tiền':
-                return formatCurrencyVND(sumTotal(index));
+                return formatCurrencyVND(sumTotal(listTransferPerson, index));
               case 'QR':
                 return `![QR Code](https://img.vietqr.io/image/${selectedKeyBank}-${valueAccountNumber}-print.png?amount=${sumTotal(
+                  listTransferPerson,
                   index
                 )}&accountName=${selectedKeyName} =200x256)`;
               default:
@@ -295,7 +254,7 @@ export default function SplitTheBill({
     const top1 = `##### *Bạn có thể chỉnh sửa và theo dõi thông tin hóa đơn tại: [Link](${window.location.protocol}//${window.location.host}/split-the-bill/${id}) :datnt:*`;
 
     const top2 = `##### *Tổng số tiền sau khi thanh toán toàn bộ nhận được: ${formatCurrencyVND(
-      Math.round(parseInt(sumTotalBill())) || 0
+      Math.round(parseInt(sumTotalBill(listTransferPerson))) || 0
     )} :ohhhh:*`;
 
     const markdownTable = `${top1}\n\n${top2}\n\n${headerMarkdown}\n${separatorMarkdown}\n${bodyMarkdown}\n\n`;
@@ -945,7 +904,9 @@ export default function SplitTheBill({
                                 className='border-r text-center'
                                 key={indexColumn}
                               >
-                                {formatCurrencyVND(sumTotal(index))}
+                                {formatCurrencyVND(
+                                  sumTotal(listTransferPerson, index)
+                                )}
                               </td>
                             );
                           case 'QR':
@@ -958,6 +919,7 @@ export default function SplitTheBill({
                                     width={200}
                                     alt='NextUI hero Image'
                                     src={`https://img.vietqr.io/image/${selectedKeyBank}-${valueAccountNumber}-print.png?amount=${sumTotal(
+                                      listTransferPerson,
                                       index
                                     )}&accountName=${selectedKeyName}`}
                                   />
@@ -1027,7 +989,9 @@ export default function SplitTheBill({
 
           <div className='text-md italic text-slate-500'>
             Tổng số tiền sau khi thanh toán toàn bộ nhận được:{' '}
-            {formatCurrencyVND(Math.round(parseInt(sumTotalBill())) || 0)}
+            {formatCurrencyVND(
+              Math.round(parseInt(sumTotalBill(listTransferPerson))) || 0
+            )}
           </div>
           {!isReadOnly() && (
             <div className='flex justify-between'>

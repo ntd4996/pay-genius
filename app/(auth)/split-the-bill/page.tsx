@@ -185,7 +185,12 @@ export default function Home() {
         default:
           return (
             <div className='flex w-full flex-row items-center justify-center gap-1'>
-              <AnimatedTooltip items={people} id={data._id} refetch={refetch} />
+              <AnimatedTooltip
+                items={people}
+                id={data._id}
+                refetch={refetch}
+                data={data}
+              />
             </div>
           );
       }

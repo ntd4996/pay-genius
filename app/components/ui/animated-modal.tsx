@@ -6,6 +6,7 @@ import { useMutation } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname, useRouter } from 'next/navigation';
 import React, {
+  Fragment,
   ReactNode,
   createContext,
   useContext,
@@ -108,7 +109,7 @@ export const ModalBody = ({
           <motion.div
             ref={modalRef}
             className={cn(
-              'relative z-50 flex h-fit flex-1 flex-col overflow-hidden border border-transparent bg-white dark:border-neutral-800 dark:bg-neutral-950 md:max-w-[40%] md:rounded-2xl',
+              'relative z-50 flex h-fit flex-1 flex-col overflow-hidden border border-transparent bg-white dark:border-neutral-800 dark:bg-neutral-950 md:max-w-fit md:rounded-2xl',
               className
             )}
             initial={{
@@ -146,9 +147,11 @@ export const ModalBody = ({
 export const ModalContent = ({
   children,
   className,
+  isDelete = true,
 }: {
   children: ReactNode;
   className?: string;
+  isDelete?: boolean;
 }) => {
   return (
     <div className={cn('flex flex-1 flex-col p-8 md:p-10', className)}>
@@ -163,12 +166,16 @@ export const ModalFooter = ({
   classNameClose,
   id,
   refetch,
+  isDelete = true,
+  listTransferPerson,
 }: {
   children?: ReactNode;
   className?: string;
   classNameClose?: string;
   id?: string | string[];
   refetch?: () => void;
+  isDelete?: boolean;
+  listTransferPerson?: any[];
 }) => {
   const { setOpen } = useModal();
   const path = usePathname();
@@ -200,6 +207,39 @@ export const ModalFooter = ({
       },
     });
 
+  const handleUpdateBill = async () => {
+    const body = {
+      listTransferPerson,
+      status: 'unSuccess',
+    };
+    const isSuccess = listTransferPerson?.every(
+      (person: any) => person.checked
+    );
+    if (!isSuccess) {
+      body.status = 'unSuccess';
+    } else {
+      body.status = 'success';
+    }
+    await updateBill(body);
+  };
+
+  const { mutate: updateBill, isPending: isLoadingUpdate } = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await axios.put(`/api/bill/${id}`, data);
+      return response.data;
+    },
+    onSuccess: () => {
+      toast.success('Đã cập nhật hóa đơn thành công');
+      if (refetch) {
+        refetch();
+      }
+      setOpen(false);
+    },
+    onError: (e) => {
+      toast.error('Có lỗi xảy ra');
+    },
+  });
+
   return (
     <div
       className={cn(
@@ -207,28 +247,58 @@ export const ModalFooter = ({
         className
       )}
     >
-      <Button
-        aria-hidden={false}
-        className={cn(classNameClose)}
-        onClick={() => {
-          setOpen(false);
-        }}
-        isLoading={isLoadingDelete}
-      >
-        Close
-      </Button>
+      {isDelete ? (
+        <Fragment>
+          <Button
+            aria-hidden={false}
+            className={cn(classNameClose)}
+            onClick={() => {
+              setOpen(false);
+            }}
+            isLoading={isLoadingDelete}
+          >
+            Close
+          </Button>
 
-      <Button
-        aria-hidden={false}
-        className={cn(classNameClose)}
-        onClick={() => {
-          deleteBill();
-        }}
-        color='danger'
-        isLoading={isLoadingDelete}
-      >
-        Xóa hóa đơn
-      </Button>
+          <Button
+            aria-hidden={false}
+            className={cn(classNameClose)}
+            onClick={() => {
+              deleteBill();
+            }}
+            color='danger'
+            isLoading={isLoadingDelete}
+          >
+            Xóa hóa đơn
+          </Button>
+        </Fragment>
+      ) : (
+        <Fragment>
+          <Button
+            aria-hidden={false}
+            className={cn(classNameClose)}
+            onClick={() => {
+              setOpen(false);
+            }}
+            isLoading={isLoadingUpdate}
+          >
+            Close
+          </Button>
+
+          <Button
+            aria-hidden={false}
+            className={cn(classNameClose)}
+            onClick={() => {
+              handleUpdateBill();
+            }}
+            color='primary'
+            isLoading={isLoadingUpdate}
+          >
+            Lưu
+          </Button>
+        </Fragment>
+      )}
+
       {children}
     </div>
   );
