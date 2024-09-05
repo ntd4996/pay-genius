@@ -687,6 +687,7 @@ export default function SplitTheBill({
                 value={amountDiscount}
                 onChange={(e) => {
                   setAmountDiscount(e ?? '');
+                  calculator();
                 }}
                 isDisabled={isLoadingCreate || isLoadingUpdate || isReadOnly()}
               />
@@ -696,6 +697,7 @@ export default function SplitTheBill({
                 value={shipping}
                 onChange={(e) => {
                   setShipping(e ?? '');
+                  calculator();
                 }}
                 isDisabled={isLoadingCreate || isLoadingUpdate || isReadOnly()}
               />

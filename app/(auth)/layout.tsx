@@ -3,8 +3,6 @@ import { useSession } from 'next-auth/react';
 import Header from '../components/Header';
 import Lottie from 'react-lottie';
 import LoadingJson from '../components/lotties/json/loading.json';
-import { useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 
 export default function DashboardLayout({
   children,

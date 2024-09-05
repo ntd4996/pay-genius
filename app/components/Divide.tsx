@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client';
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import {
   Autocomplete,
   AutocompleteItem,
@@ -23,7 +23,6 @@ import { Mentions } from '../data/mentions';
 import Close from '../assets/svg/Close';
 import CheckIcon from '../assets/svg/CheckIcon';
 import Copy from '../assets/svg/Copy';
-import CurrencyInput from 'react-currency-input-field';
 import NumberInput from './NumberInput';
 
 export default function Divide() {

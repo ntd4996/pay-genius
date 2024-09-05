@@ -13,7 +13,6 @@ import {
   Input,
   Pagination,
   Selection,
-  Spinner,
   Table,
   TableBody,
   TableCell,
@@ -34,19 +33,10 @@ import CheckBadge from '@/app/assets/svg/CheckBadge';
 import Clock from '@/app/assets/svg/Clock';
 import BankNotes from '@/app/assets/svg/BankNotes';
 import { AnimatedListExport } from '@/app/components/ui/AnimatedList';
-import Edit from '@/app/assets/svg/Edit';
 import dayjs from 'dayjs';
 import NoData from '@/app/components/lotties/json/no-data.json';
 import Lottie from 'react-lottie';
 import { useRouter } from 'next/navigation';
-import {
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalTrigger,
-} from '@/app/components/ui/animated-modal';
-import TrashBin from '@/app/assets/svg/TrashBin';
 import { SearchIcon } from '@/app/assets/svg/SearchIcon';
 
 const statusColorMap: Record<string, ChipProps['color']> = {
@@ -56,6 +46,7 @@ const statusColorMap: Record<string, ChipProps['color']> = {
 import { useDebounce } from 'use-debounce';
 import { ChevronDownIcon } from '@/app/assets/svg/ChevronDownIcon';
 import { statusOptions } from '@/app/data/status';
+import { AnimatedTooltip } from '@/app/components/ui/animated-tooltip';
 
 const DEBOUNCE_MS = 300;
 
@@ -153,12 +144,29 @@ export default function Home() {
   const redirectToCreate = useCallback(() => {
     router.push('/split-the-bill/create');
   }, [router]);
-  const redirectToDetail = useCallback(
-    (id: string) => {
-      router.push('/split-the-bill/' + id);
-    },
-    [router]
-  );
+
+  const people = useMemo(() => {
+    return [
+      {
+        id: 1,
+        name: 'Chi tiết',
+        designation: 'Chi tiết hóa đơn',
+        event: 'edit',
+      },
+      {
+        id: 2,
+        name: 'Xem nhanh',
+        designation: 'Xem nhanh hóa đơn',
+        event: 'preview',
+      },
+      {
+        id: 3,
+        name: 'Xóa',
+        designation: 'Xóa hóa đơn',
+        event: 'delete',
+      },
+    ];
+  }, []);
 
   const renderCell = useCallback(
     (data: any, columnKey: React.Key) => {
@@ -176,40 +184,13 @@ export default function Home() {
 
         default:
           return (
-            <div className='flex items-center justify-center gap-2'>
-              <div
-                className='text-center'
-                onClick={() => {
-                  redirectToDetail(data._id);
-                }}
-              >
-                <Edit className='cursor-pointer hover:text-primary' />
-              </div>
-              <Modal>
-                <ModalTrigger>
-                  <div>
-                    <TrashBin className='h-5 w-5 cursor-pointer text-[#191a1f] hover:text-danger' />
-                  </div>
-                </ModalTrigger>
-
-                <ModalBody>
-                  <ModalContent>
-                    <div className='text-center text-lg'>
-                      Bạn có chắc chắn muốn xóa hóa đơn này không?
-                    </div>
-                  </ModalContent>
-                  <ModalFooter
-                    className='gap-4'
-                    id={data._id}
-                    refetch={refetch}
-                  />
-                </ModalBody>
-              </Modal>
+            <div className='flex w-full flex-row items-center justify-center gap-1'>
+              <AnimatedTooltip items={people} id={data._id} refetch={refetch} />
             </div>
           );
       }
     },
-    [redirectToDetail, refetch]
+    [people, refetch]
   );
 
   const sumTotalBill = (listTransferPerson: any) => {

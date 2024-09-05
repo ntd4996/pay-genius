@@ -2,7 +2,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import {
   Autocomplete,
   AutocompleteItem,
@@ -14,7 +14,7 @@ import {
 } from '@nextui-org/react';
 import { DataBank } from '../data/bank';
 import axios from '../libs/axios';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import NumberInput from './NumberInput';
 
 export default function CreateQR() {

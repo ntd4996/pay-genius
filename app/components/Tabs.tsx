@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Tabs, Tab, Card, CardBody } from '@nextui-org/react';
-import DivideByEachPerson from './DivideByEachPerson';
+import { Tabs, Tab } from '@nextui-org/react';
 import Divide from './Divide';
 import CreateQR from './CreateQR';
 

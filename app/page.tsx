@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Button } from '@nextui-org/react';
 import { signIn, useSession } from 'next-auth/react';
 import { Boxes } from './components/ui/background-boxes';

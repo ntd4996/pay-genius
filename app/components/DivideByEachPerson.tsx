@@ -19,7 +19,7 @@ import TrashBin from '../assets/svg/TrashBin';
 import { Controller, useForm } from 'react-hook-form';
 import Select from 'react-select';
 import { DataBank } from '../data/bank';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import Copy from '../assets/svg/Copy';
 import CheckIcon from '../assets/svg/CheckIcon';
 import { useQuery } from '@tanstack/react-query';
