@@ -292,13 +292,13 @@ export default function SplitTheBill({
       })
       .join('\n');
 
-    const bottom1 = `##### *Bạn có thể chỉnh sửa và theo dõi thông tin hóa đơn tại: [Link](${window.location.protocol}//${window.location.host}/split-the-bill/${id}) :datnt:*`;
+    const top1 = `##### *Bạn có thể chỉnh sửa và theo dõi thông tin hóa đơn tại: [Link](${window.location.protocol}//${window.location.host}/split-the-bill/${id}) :datnt:*`;
 
-    const bottom2 = `##### *Tổng số tiền sau khi thanh toán toàn bộ nhận được: ${formatCurrencyVND(
+    const top2 = `##### *Tổng số tiền sau khi thanh toán toàn bộ nhận được: ${formatCurrencyVND(
       Math.round(parseInt(sumTotalBill())) || 0
     )} :ohhhh:*`;
 
-    const markdownTable = `${bottom1}\n\n${bottom2}\n\n${headerMarkdown}\n${separatorMarkdown}\n${bodyMarkdown}\n\n${bottom1}\n\n${bottom2}`;
+    const markdownTable = `${top1}\n\n${top2}\n\n${headerMarkdown}\n${separatorMarkdown}\n${bodyMarkdown}\n\n`;
 
     return markdownTable;
   };

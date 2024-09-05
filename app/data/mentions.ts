@@ -32,7 +32,7 @@ export const Mentions = [
     label: '@hiennt',
   },
   {
-    value: '@hungnm :smile_in_tears:',
+    value: '@hungnm :chanbedu:',
     label: '@hungnm',
   },
   {
@@ -40,7 +40,7 @@ export const Mentions = [
     label: '@lent',
   },
   {
-    value: '@minhnb :oke-man:',
+    value: '@minhnb :lieuhon:',
     label: '@minhnb',
   },
   {
@@ -48,7 +48,7 @@ export const Mentions = [
     label: '@nhatlq',
   },
   {
-    value: '@son :pepe_amazed:',
+    value: '@son :hocmau:',
     label: '@son',
   },
   {
@@ -56,7 +56,7 @@ export const Mentions = [
     label: '@sonhp',
   },
   {
-    value: '@trant :pepe_cry_trans:',
+    value: '@trant :yaotea:',
     label: '@trant',
   },
   {

@@ -41,7 +41,7 @@ const ShinyButton = ({
       )}
     >
       <span
-        className='relative block h-full w-full text-sm uppercase tracking-wide text-[rgb(255,255,255,90%)] dark:font-light dark:text-[rgb(255,255,255,90%)]'
+        className='relative block w-full text-sm uppercase tracking-wide text-[rgb(255,255,255,90%)] dark:font-light dark:text-[rgb(255,255,255,90%)]'
         style={{
           maskImage:
             'linear-gradient(-75deg,hsl(var(--primary)) calc(var(--x) + 20%),transparent calc(var(--x) + 30%),hsl(var(--primary)) calc(var(--x) + 100%))',
