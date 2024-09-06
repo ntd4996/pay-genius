@@ -112,6 +112,38 @@ export async function GET(request: NextRequest) {
       }
     });
 
+    const extractUsername = (
+      email: string | null | undefined
+    ): string | null => {
+      if (!email) return null;
+      const atIndex = email.indexOf('@');
+      return atIndex !== -1 ? email.substring(0, atIndex) : null;
+    };
+
+    const username = extractUsername(token.email);
+    let listMentionBillsUnSuccess = [] as any[];
+
+    if (username) {
+      const regex = new RegExp(`^@${username}`, 'i');
+
+      const listMentionBills = await Bill.find({
+        'listTransferPerson.mention': { $regex: regex },
+        status: 'unSuccess',
+      });
+
+      listMentionBillsUnSuccess = listMentionBills.flatMap((bill) =>
+        bill.listTransferPerson
+          .filter(
+            (person: any) => regex.test(person.mention) && !person.checked
+          )
+          .map((person: any) => ({
+            id: bill._id,
+            nameBill: bill.nameBill,
+            moneyAfterReduction: person.moneyAfterReduction,
+          }))
+      );
+    }
+
     return NextResponse.json(
       {
         message: 'List bills',
@@ -120,6 +152,7 @@ export async function GET(request: NextRequest) {
         totalBills,
         totalChecked,
         totalUnChecked,
+        listMentionBills: listMentionBillsUnSuccess,
       },
       { status: 200 }
     );

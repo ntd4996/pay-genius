@@ -21,7 +21,7 @@ import {
   TableRow,
 } from '@nextui-org/react';
 import { useSession } from 'next-auth/react';
-import { useCallback, useMemo, useState } from 'react';
+import { Fragment, useCallback, useMemo, useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import axios from '@/app/libs/axios';
 import PlantOne from '@/app/assets/svg/plans/PlantOne';
@@ -32,12 +32,12 @@ import ShinyButton from '@/app/components/ui/button-custom';
 import CheckBadge from '@/app/assets/svg/CheckBadge';
 import Clock from '@/app/assets/svg/Clock';
 import BankNotes from '@/app/assets/svg/BankNotes';
-import { AnimatedListExport } from '@/app/components/ui/AnimatedList';
 import dayjs from 'dayjs';
 import NoData from '@/app/components/lotties/json/no-data.json';
 import Lottie from 'react-lottie';
 import { useRouter } from 'next/navigation';
 import { SearchIcon } from '@/app/assets/svg/SearchIcon';
+import listJson from '@/app/components/lotties/json/list.json';
 
 const statusColorMap: Record<string, ChipProps['color']> = {
   success: 'success',
@@ -63,6 +63,7 @@ export default function Home() {
   const [debouncedQuery] = useDebounce(filterValue, DEBOUNCE_MS);
   const [statusFilter, setStatusFilter] = useState<Selection>('all');
   const [key, setKey] = useState(0);
+  const [listMentionBills, setListMentionBills] = useState([]);
 
   const { isLoading, refetch } = useQuery({
     queryKey: [`get-list-bill`, page, debouncedQuery, key],
@@ -79,6 +80,7 @@ export default function Home() {
         data.totalUnChecked ? parseInt(data.totalUnChecked) : 0
       );
       setListData(data.bills ?? []);
+      setListMentionBills(data.listMentionBills ?? []);
       return data.bills;
     },
     staleTime: DEBOUNCE_MS,
@@ -144,6 +146,13 @@ export default function Home() {
   const redirectToCreate = useCallback(() => {
     router.push('/split-the-bill/create');
   }, [router]);
+
+  const redirectToDetail = useCallback(
+    (id: string) => {
+      router.push('/split-the-bill/' + id);
+    },
+    [router]
+  );
 
   const people = useMemo(() => {
     return [
@@ -331,7 +340,7 @@ export default function Home() {
                             },
                           }}
                           width={400}
-                          height={400}
+                          height={300}
                         />
                       </div>
                     }
@@ -419,8 +428,56 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className='relative flex max-h-[640px] min-h-[500px] flex-1  flex-col gap-6 overflow-hidden rounded-3xl border px-4 py-6'>
-                <AnimatedListExport />
+              <div className='relative flex flex-1  flex-col gap-6 overflow-hidden rounded-3xl border px-4 py-6'>
+                {listMentionBills?.length > 0 ? (
+                  <Fragment>
+                    <div className='text-center text-2xl'>
+                      Hóa đơn chưa thanh toán
+                    </div>
+                    <table className='max-h-[500px]'>
+                      <thead>
+                        <tr className='h-10 bg-gray-100 text-left text-sm font-thin text-gray-500'>
+                          <th className='pl-4'>Tên hóa đơn</th>
+                          <th className=''>Số tiền</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {listMentionBills.map((item: any) => (
+                          <tr
+                            key={item.id}
+                            className='h-10 cursor-pointer border-b hover:bg-slate-200'
+                            onClick={() => redirectToDetail(item.id)}
+                          >
+                            <td className='pl-4'>{item.nameBill}</td>
+                            <td className='text-primary'>
+                              {formatCurrency(
+                                Math.round(item.moneyAfterReduction) || 0
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </Fragment>
+                ) : (
+                  <Fragment>
+                    <Lottie
+                      options={{
+                        loop: true,
+                        autoplay: true,
+                        animationData: listJson,
+                        rendererSettings: {
+                          preserveAspectRatio: 'xMidYMid slice',
+                        },
+                      }}
+                      width={400}
+                      isClickToPauseDisabled
+                    />
+                    <div className='text-center text-lg italic text-gray-500'>
+                      Bạn không còn hóa đơn chưa thanh toán!
+                    </div>
+                  </Fragment>
+                )}
               </div>
             </div>
           </div>
