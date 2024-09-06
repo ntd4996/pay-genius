@@ -19,6 +19,7 @@ import {
   Checkbox,
   Image,
   Input,
+  Progress,
 } from '@nextui-org/react';
 import { useMutation } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useState, Fragment } from 'react';
@@ -494,6 +495,14 @@ export default function SplitTheBill({
 
   return (
     <Fragment>
+      {isPending && (
+        <Progress
+          size='sm'
+          isIndeterminate
+          aria-label='Loading...'
+          className='w-full'
+        />
+      )}
       <div
         className={cn(
           'flex w-full flex-col gap-4',

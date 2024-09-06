@@ -12,6 +12,7 @@ import {
   Image,
   Input,
   Pagination,
+  Progress,
   Selection,
   Table,
   TableBody,
@@ -38,6 +39,7 @@ import Lottie from 'react-lottie';
 import { useRouter } from 'next/navigation';
 import { SearchIcon } from '@/app/assets/svg/SearchIcon';
 import listJson from '@/app/components/lotties/json/list.json';
+import loadingEarthJson from '@/app/components/lotties/json/loading-earth.json';
 
 const statusColorMap: Record<string, ChipProps['color']> = {
   success: 'success',
@@ -232,6 +234,15 @@ export default function Home() {
 
   return (
     <div className='isolate mx-auto flex min-h-full-screen flex-col'>
+      {isLoading && (
+        <Progress
+          size='sm'
+          isIndeterminate
+          aria-label='Loading...'
+          className='w-full'
+        />
+      )}
+
       <div
         className={cn(
           'flex w-full flex-col',
@@ -295,67 +306,82 @@ export default function Home() {
                     </DropdownMenu>
                   </Dropdown>
                 </div>
-
-                <Table
-                  isCompact
-                  removeWrapper
-                  classNames={{
-                    th: 'bg-[#f4f4f4] uppercase text-[#191a1f] font-semibold',
-                    tr: 'hover:bg-[#f4f4f4] h-[50px] rounded-3xl',
-                    tbody: 'min-h-[300px]',
-                  }}
-                  bottomContent={
-                    pages > 1 ? (
-                      <div className='flex w-full justify-center'>
-                        <Pagination
-                          isCompact
-                          showControls
-                          showShadow
-                          color='primary'
-                          page={page}
-                          total={pages}
-                          onChange={(page) => setPage(page)}
-                        />
-                      </div>
-                    ) : null
-                  }
-                >
-                  <TableHeader>
-                    <TableColumn>Tên hóa đơn</TableColumn>
-                    <TableColumn width={180}>Tổng số tiền</TableColumn>
-                    <TableColumn width={120}>Trạng thái</TableColumn>
-                    <TableColumn width={150}>Ngày Tạo</TableColumn>
-                    <TableColumn width={120}>&nbsp;</TableColumn>
-                  </TableHeader>
-                  <TableBody
-                    emptyContent={
-                      <div className='flex items-center justify-center'>
-                        <Lottie
-                          options={{
-                            loop: true,
-                            autoplay: true,
-                            animationData: NoData,
-                            rendererSettings: {
-                              preserveAspectRatio: 'xMidYMid slice',
-                            },
-                          }}
-                          width={400}
-                          height={300}
-                        />
-                      </div>
+                {isLoading ? (
+                  <div>
+                    <Lottie
+                      options={{
+                        loop: true,
+                        autoplay: true,
+                        animationData: loadingEarthJson,
+                        rendererSettings: {
+                          preserveAspectRatio: 'xMidYMid slice',
+                        },
+                      }}
+                      width={350}
+                      isClickToPauseDisabled
+                    />
+                  </div>
+                ) : (
+                  <Table
+                    isCompact
+                    removeWrapper
+                    classNames={{
+                      th: 'bg-[#f4f4f4] uppercase text-[#191a1f] font-semibold',
+                      tr: 'hover:bg-[#f4f4f4] h-[50px] rounded-3xl',
+                      tbody: 'min-h-[300px]',
+                    }}
+                    bottomContent={
+                      pages > 1 ? (
+                        <div className='flex w-full justify-center'>
+                          <Pagination
+                            isCompact
+                            showControls
+                            showShadow
+                            color='primary'
+                            page={page}
+                            total={pages}
+                            onChange={(page) => setPage(page)}
+                          />
+                        </div>
+                      ) : null
                     }
-                    items={listData}
-                    isLoading={isLoading}
                   >
-                    {(item: any) => (
-                      <TableRow key={item._id}>
-                        {(columnKey) => (
-                          <TableCell>{renderCell(item, columnKey)}</TableCell>
-                        )}
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
+                    <TableHeader>
+                      <TableColumn>Tên hóa đơn</TableColumn>
+                      <TableColumn width={180}>Tổng số tiền</TableColumn>
+                      <TableColumn width={120}>Trạng thái</TableColumn>
+                      <TableColumn width={150}>Ngày Tạo</TableColumn>
+                      <TableColumn width={120}>&nbsp;</TableColumn>
+                    </TableHeader>
+                    <TableBody
+                      emptyContent={
+                        <div className='flex items-center justify-center'>
+                          <Lottie
+                            options={{
+                              loop: true,
+                              autoplay: true,
+                              animationData: NoData,
+                              rendererSettings: {
+                                preserveAspectRatio: 'xMidYMid slice',
+                              },
+                            }}
+                            width={400}
+                            height={300}
+                          />
+                        </div>
+                      }
+                      items={listData}
+                    >
+                      {(item: any) => (
+                        <TableRow key={item._id}>
+                          {(columnKey) => (
+                            <TableCell>{renderCell(item, columnKey)}</TableCell>
+                          )}
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                )}
               </div>
             </div>
 
