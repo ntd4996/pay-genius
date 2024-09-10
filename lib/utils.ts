@@ -53,3 +53,13 @@ export const processString = (input: string): string => {
 
   return input.substring(0, index);
 };
+
+export const getInfoBill = (
+  valueNameBill: string,
+  idOrder: string,
+  mention: string
+) => {
+  return `ORDER${valueNameBill.toUpperCase().replaceAll(' ', '')}${
+    idOrder ?? ''
+  } ${processString(mention)}`;
+};

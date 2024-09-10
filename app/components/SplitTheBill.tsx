@@ -8,7 +8,13 @@ import NumberInput from '@/app/components/NumberInput';
 import { DataBank } from '@/app/data/bank';
 import { Mentions } from '@/app/data/mentions';
 import axios from '@/app/libs/axios';
-import { cn, formatCurrencyVND, sumTotal, sumTotalBill } from '@/lib/utils';
+import {
+  cn,
+  formatCurrencyVND,
+  getInfoBill,
+  sumTotal,
+  sumTotalBill,
+} from '@/lib/utils';
 import {
   Autocomplete,
   AutocompleteItem,
@@ -84,6 +90,7 @@ export default function SplitTheBill({
   const [amountDiscount, setAmountDiscount] = useState('');
   const [shipping, setShipping] = useState('');
   const [copied, setCopied] = useState(false);
+  const [idOrder, setIdOrder] = useState('');
 
   const [headerTable, setHeaderTable] = useState([
     {
@@ -201,7 +208,7 @@ export default function SplitTheBill({
     setListTransferPerson(newArray);
   };
 
-  const convertTableToMarkdown = (id: string): string => {
+  const convertTableToMarkdown = (id: string, uid: string): string => {
     const initHeaderTable = [...headerTable];
     const updatedHeader = initHeaderTable.filter(
       (item) =>
@@ -224,7 +231,7 @@ export default function SplitTheBill({
           .map((header: any, indexColumn) => {
             switch (header.label) {
               case 'Đã thanh toán':
-                return person.checked ? ':white_check_mark:' : ':o:';
+                return person.checked ? ':white_check_mark:' : '';
               case '@':
                 return person.mention;
               case 'Số tiền':
@@ -241,7 +248,11 @@ export default function SplitTheBill({
                 return `![QR Code](https://img.vietqr.io/image/${selectedKeyBank}-${valueAccountNumber}-print.png?amount=${sumTotal(
                   listTransferPerson,
                   index
-                )}&accountName=${selectedKeyName} =200x256)`;
+                )}&accountName=${selectedKeyName}&addInfo=${getInfoBill(
+                  valueNameBill ?? '',
+                  uid ?? '',
+                  listTransferPerson[index].mention ?? ''
+                )} =200x256)`;
               default:
                 return formatCurrencyVND(
                   Math.round(parseInt(person[`value-${indexColumn + 4}`] ?? 0))
@@ -403,13 +414,16 @@ export default function SplitTheBill({
       return response.data;
     },
     onSuccess: (data) => {
-      router.push('/split-the-bill/');
-      const markdownTable = convertTableToMarkdown(data.bill._id);
+      const markdownTable = convertTableToMarkdown(
+        data.bill._id,
+        data.bill.uid ?? ''
+      );
       navigator.clipboard.writeText(markdownTable).then(() => {
         setCopied(true);
         toast.success('Copy markdown thành công');
         setTimeout(() => setCopied(false), 2000);
       });
+      router.push('/split-the-bill/');
     },
     onError: (e) => {
       toast.error('Có lỗi xảy ra');
@@ -422,7 +436,10 @@ export default function SplitTheBill({
       return response.data;
     },
     onSuccess: (data) => {
-      const markdownTable = convertTableToMarkdown(data.bill._id);
+      const markdownTable = convertTableToMarkdown(
+        data.bill._id,
+        data.bill.uid ?? ''
+      );
       navigator.clipboard.writeText(markdownTable).then(() => {
         setCopied(true);
         toast.success('Đã cập nhật và Copy markdown thành công');
@@ -477,6 +494,7 @@ export default function SplitTheBill({
         shipping,
         listTransferPerson,
         headerTable,
+        uid,
       } = dataBill;
       setValue('name', name);
       setValue('bank', bank);
@@ -490,6 +508,7 @@ export default function SplitTheBill({
       setHeaderTable(headerTable);
       setValueNameBill(nameBill);
       setSelectedKeyName(name);
+      setIdOrder(uid);
     }
   }, [dataBill, isCreate, setValue]);
 
@@ -677,7 +696,11 @@ export default function SplitTheBill({
               <Image
                 width={300}
                 alt='QR Image'
-                src={`https://img.vietqr.io/image/${selectedKeyBank}-${valueAccountNumber}-print.png?accountName=${selectedKeyName}`}
+                src={`https://img.vietqr.io/image/${selectedKeyBank}-${valueAccountNumber}-print.png?accountName=${selectedKeyName}&addInfo=${getInfoBill(
+                  valueNameBill ?? '',
+                  idOrder ?? '',
+                  ''
+                )}`}
               />
             ) : (
               <div>
@@ -930,7 +953,11 @@ export default function SplitTheBill({
                                     src={`https://img.vietqr.io/image/${selectedKeyBank}-${valueAccountNumber}-print.png?amount=${sumTotal(
                                       listTransferPerson,
                                       index
-                                    )}&accountName=${selectedKeyName}`}
+                                    )}&accountName=${selectedKeyName}&addInfo=${getInfoBill(
+                                      valueNameBill ?? '',
+                                      idOrder ?? '',
+                                      listTransferPerson[index].mention ?? ''
+                                    )}`}
                                   />
                                 ) : (
                                   <div>

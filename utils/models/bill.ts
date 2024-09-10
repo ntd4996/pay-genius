@@ -1,6 +1,11 @@
-import mongoose from 'mongoose';
+import { Schema, model, Model, models } from 'mongoose';
 
-const billSchema = new mongoose.Schema({
+const billSchema = new Schema({
+  uid: {
+    type: Number,
+    required: true,
+    unique: true,
+  },
   nameBill: {
     type: String,
     required: true,
@@ -52,6 +57,16 @@ const billSchema = new mongoose.Schema({
   },
 });
 
-const Bill = mongoose.models.bill || mongoose.model('bill', billSchema);
+billSchema.pre('validate', async function (next) {
+  if (this.isNew) {
+    const lastBill = await (this.constructor as Model<any>)
+      .findOne()
+      .sort({ uid: -1 });
+    this.uid = lastBill && lastBill.uid ? lastBill.uid + 1 : 1;
+  }
+  next();
+});
+
+const Bill = models.Bill || model('Bill', billSchema);
 
 export default Bill;
