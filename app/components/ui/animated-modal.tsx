@@ -1,6 +1,12 @@
 'use client';
 import axios from '@/app/libs/axios';
-import { cn } from '@/lib/utils';
+import {
+  cn,
+  formatCurrencyVND,
+  getInfoBill,
+  sumTotal,
+  sumTotalBill,
+} from '@/lib/utils';
 import { Button } from '@nextui-org/react';
 import { useMutation } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -167,15 +173,27 @@ export const ModalFooter = ({
   id,
   refetch,
   isDelete = true,
-  listTransferPerson,
+  listTransferPerson = [],
+  headerTable = [],
+  uid,
+  nameBill,
+  accountNumber,
+  bankName,
+  accountName,
 }: {
   children?: ReactNode;
   className?: string;
   classNameClose?: string;
-  id?: string | string[];
+  id?: string;
+  uid?: string;
+  headerTable?: Array<any>;
   refetch?: () => void;
   isDelete?: boolean;
   listTransferPerson?: any[];
+  nameBill?: string;
+  accountNumber?: string;
+  bankName?: string;
+  accountName?: string;
 }) => {
   const { setOpen } = useModal();
   const path = usePathname();
@@ -223,11 +241,120 @@ export const ModalFooter = ({
     await updateBill(body);
   };
 
+  const convertTableToMarkdown = (
+    id: string,
+    uid: string,
+    isSuccess: boolean = false
+  ): string => {
+    const initHeaderTable = [...headerTable];
+    const updatedHeader = initHeaderTable.filter(
+      (item) =>
+        item.label !== 'Xóa' &&
+        item.label !== 'Số tiền' &&
+        item.label !== 'Số tiền được giảm giá'
+    );
+
+    const headerMarkdown = `| ${updatedHeader
+      .map((header: any) => header.label)
+      .join(' | ')} |`;
+
+    const separatorMarkdown = `|${Array(updatedHeader.length)
+      .fill(' --- ')
+      .join('|')}|`;
+
+    const bodyMarkdown = listTransferPerson
+      .map((person: any, index) => {
+        return `| ${updatedHeader
+          .map((header: any, indexColumn) => {
+            switch (header.label) {
+              case 'Đã thanh toán':
+                return person.checked ? ':white_check_mark:' : '';
+              case '@':
+                return person.mention;
+              case 'Số tiền':
+                return formatCurrencyVND(
+                  Math.round(parseInt(person.amount)) || 0
+                );
+              case 'Số tiền được giảm giá':
+                return formatCurrencyVND(person.discountAmount) || 0;
+              case 'Tiền sau khi giảm':
+                return formatCurrencyVND(person.moneyAfterReduction);
+              case 'Tổng Tiền':
+                return formatCurrencyVND(sumTotal(listTransferPerson, index));
+              case 'QR':
+                return `![QR Code](https://img.vietqr.io/image/${bankName}-${accountNumber}-print.png?amount=${sumTotal(
+                  listTransferPerson,
+                  index
+                )}&accountName=${accountName}&addInfo=${getInfoBill(
+                  nameBill ?? '',
+                  uid ?? '',
+                  listTransferPerson[index].mention ?? ''
+                )} =200x256)`;
+              default:
+                return formatCurrencyVND(
+                  Math.round(parseInt(person[`value-${indexColumn + 4}`] ?? 0))
+                );
+            }
+          })
+          .join(' | ')} |`;
+      })
+      .join('\n');
+
+    const top = `#### Thông tin hóa đơn: ${nameBill}\n\n ##### *Trạng thái hóa đơn: ${
+      isSuccess
+        ? ':white_check_mark: Đã hoàn thành'
+        : ':negative_squared_cross_mark: Chưa hoàn thành'
+    }*`;
+    const top1 = `##### *Bạn có thể chỉnh sửa và theo dõi thông tin hóa đơn tại: [Link](${window.location.protocol}//${window.location.host}/split-the-bill/${id}) :datnt:*`;
+
+    const top2 = `##### *Tổng số tiền sau khi thanh toán toàn bộ nhận được: ${formatCurrencyVND(
+      Math.round(parseInt(sumTotalBill(listTransferPerson))) || 0
+    )} :ohhhh:*`;
+
+    const markdownTable = `${top}\n\n${top1}\n\n${top2}\n\n${headerMarkdown}\n${separatorMarkdown}\n${bodyMarkdown}\n\n`;
+
+    return markdownTable;
+  };
+
   const { mutate: updateBill, isPending: isLoadingUpdate } = useMutation({
     mutationFn: async (data: any) => {
       const response = await axios.put(`/api/bill/${id}`, data);
       return response.data;
     },
+
+    onSuccess: async (data) => {
+      if (data.bill.idPost) {
+        const isSuccess = listTransferPerson?.every(
+          (person: any) => person.checked
+        );
+        const markdownTable = convertTableToMarkdown(
+          id ?? '',
+          uid ?? '',
+          isSuccess
+        );
+        await putMessage({
+          id: data.bill._id,
+          message: markdownTable,
+        });
+      } else {
+        toast.success('Đã cập nhật hóa đơn thành công');
+        if (refetch) {
+          refetch();
+        }
+        setOpen(false);
+      }
+    },
+    onError: (e) => {
+      toast.error('Có lỗi xảy ra');
+    },
+  });
+
+  const { mutate: putMessage, isPending: isLoadingPost } = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await axios.put(`/api/mattermost`, data);
+      return response.data;
+    },
+
     onSuccess: () => {
       toast.success('Đã cập nhật hóa đơn thành công');
       if (refetch) {
@@ -280,7 +407,7 @@ export const ModalFooter = ({
             onClick={() => {
               setOpen(false);
             }}
-            isLoading={isLoadingUpdate}
+            isLoading={isLoadingUpdate || isLoadingPost}
           >
             Close
           </Button>
@@ -292,7 +419,7 @@ export const ModalFooter = ({
               handleUpdateBill();
             }}
             color='primary'
-            isLoading={isLoadingUpdate}
+            isLoading={isLoadingUpdate || isLoadingPost}
           >
             Lưu
           </Button>

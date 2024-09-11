@@ -40,6 +40,7 @@ export async function POST(request: NextRequest) {
       status,
       createBy: token.email,
     });
+
     const res = await newBill.save();
     return NextResponse.json(
       {

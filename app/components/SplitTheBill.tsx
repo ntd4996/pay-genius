@@ -208,7 +208,11 @@ export default function SplitTheBill({
     setListTransferPerson(newArray);
   };
 
-  const convertTableToMarkdown = (id: string, uid: string): string => {
+  const convertTableToMarkdown = (
+    id: string,
+    uid: string,
+    isSuccess: boolean = false
+  ): string => {
     const initHeaderTable = [...headerTable];
     const updatedHeader = initHeaderTable.filter(
       (item) =>
@@ -263,13 +267,18 @@ export default function SplitTheBill({
       })
       .join('\n');
 
+    const top = `#### Thông tin hóa đơn: ${valueNameBill}\n\n ##### *Trạng thái hóa đơn: ${
+      isSuccess
+        ? ':white_check_mark: Đã hoàn thành'
+        : ':negative_squared_cross_mark: Chưa hoàn thành'
+    }*`;
     const top1 = `##### *Bạn có thể chỉnh sửa và theo dõi thông tin hóa đơn tại: [Link](${window.location.protocol}//${window.location.host}/split-the-bill/${id}) :datnt:*`;
 
     const top2 = `##### *Tổng số tiền sau khi thanh toán toàn bộ nhận được: ${formatCurrencyVND(
       Math.round(parseInt(sumTotalBill(listTransferPerson))) || 0
     )} :ohhhh:*`;
 
-    const markdownTable = `${top1}\n\n${top2}\n\n${headerMarkdown}\n${separatorMarkdown}\n${bodyMarkdown}\n\n`;
+    const markdownTable = `${top}\n\n${top1}\n\n${top2}\n\n${headerMarkdown}\n${separatorMarkdown}\n${bodyMarkdown}\n\n`;
 
     return markdownTable;
   };
@@ -413,17 +422,46 @@ export default function SplitTheBill({
       const response = await axios.post('/api/bill', data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      const isSuccess = listTransferPerson.every(
+        (person: any) => person.checked
+      );
       const markdownTable = convertTableToMarkdown(
         data.bill._id,
-        data.bill.uid ?? ''
+        data.bill.uid ?? '',
+        isSuccess
       );
-      navigator.clipboard.writeText(markdownTable).then(() => {
-        setCopied(true);
-        toast.success('Copy markdown thành công');
-        setTimeout(() => setCopied(false), 2000);
+      await postMessage({
+        id: data.bill._id,
+        message: markdownTable,
       });
+    },
+    onError: (e) => {
+      toast.error('Có lỗi xảy ra');
+    },
+  });
+
+  const { mutate: postMessage, isPending: isLoadingPost } = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await axios.post(`/api/mattermost`, data);
+      return response.data;
+    },
+
+    onSuccess: () => {
+      toast.success(
+        'Tạo mới và đăng thông tin hóa đơn lên mattermost thành công'
+      );
       router.push('/split-the-bill/');
+    },
+    onError: (e) => {
+      toast.error('Có lỗi xảy ra');
+    },
+  });
+
+  const { mutate: putMessage, isPending: isLoadingPut } = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await axios.put(`/api/mattermost`, data);
+      return response.data;
     },
     onError: (e) => {
       toast.error('Có lỗi xảy ra');
@@ -435,16 +473,29 @@ export default function SplitTheBill({
       const response = await axios.put(`/api/bill/${id}`, data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      const isSuccess = listTransferPerson.every(
+        (person: any) => person.checked
+      );
+
       const markdownTable = convertTableToMarkdown(
         data.bill._id,
-        data.bill.uid ?? ''
+        data.bill.uid ?? '',
+        isSuccess
       );
-      navigator.clipboard.writeText(markdownTable).then(() => {
-        setCopied(true);
-        toast.success('Đã cập nhật và Copy markdown thành công');
-        setTimeout(() => setCopied(false), 2000);
-      });
+      if (data.bill.idPost) {
+        await putMessage({
+          id: data.bill._id,
+          message: markdownTable,
+        });
+        toast.success('Đã cập nhật hóa hơn và bài mattermost thành công');
+      } else {
+        navigator.clipboard.writeText(markdownTable).then(() => {
+          setCopied(true);
+          toast.success('Đã cập nhật và Copy markdown thành công');
+          setTimeout(() => setCopied(false), 2000);
+        });
+      }
     },
     onError: (e) => {
       toast.error('Có lỗi xảy ra');
@@ -559,7 +610,13 @@ export default function SplitTheBill({
               selectedKey={selectedKeyName}
               isRequired
               onKeyDown={(e: any) => e.continuePropagation()}
-              isDisabled={isLoadingCreate || isLoadingUpdate || isReadOnly()}
+              isDisabled={
+                isLoadingCreate ||
+                isLoadingPost ||
+                isLoadingPut ||
+                isLoadingUpdate ||
+                isReadOnly()
+              }
             >
               {(item) => (
                 <AutocompleteItem
@@ -606,7 +663,13 @@ export default function SplitTheBill({
               selectedKey={selectedKeyBank}
               onKeyDown={(e: any) => e.continuePropagation()}
               onSelectionChange={onSelectionChangeBank}
-              isDisabled={isLoadingCreate || isLoadingUpdate || isReadOnly()}
+              isDisabled={
+                isLoadingCreate ||
+                isLoadingPost ||
+                isLoadingPut ||
+                isLoadingUpdate ||
+                isReadOnly()
+              }
             >
               {(bank) => (
                 <AutocompleteItem key={bank.label} textValue={bank.label}>
@@ -643,7 +706,13 @@ export default function SplitTheBill({
               errorMessage={errors.accountNumber && 'Trường này là bắt buộc'}
               onChange={onInputChangeAccountNumber}
               value={valueAccountNumber}
-              isDisabled={isLoadingCreate || isLoadingUpdate || isReadOnly()}
+              isDisabled={
+                isLoadingCreate ||
+                isLoadingPost ||
+                isLoadingPut ||
+                isLoadingUpdate ||
+                isReadOnly()
+              }
             />
 
             <hr />
@@ -659,7 +728,13 @@ export default function SplitTheBill({
               errorMessage={errors.nameBill && 'Trường này là bắt buộc'}
               onChange={onInputChangeNameBill}
               value={valueNameBill}
-              isDisabled={isLoadingCreate || isLoadingUpdate || isReadOnly()}
+              isDisabled={
+                isLoadingCreate ||
+                isLoadingPost ||
+                isLoadingPut ||
+                isLoadingUpdate ||
+                isReadOnly()
+              }
             />
             <hr />
 
@@ -676,7 +751,13 @@ export default function SplitTheBill({
                   setAmountDiscount(e ?? '');
                   calculator();
                 }}
-                isDisabled={isLoadingCreate || isLoadingUpdate || isReadOnly()}
+                isDisabled={
+                  isLoadingCreate ||
+                  isLoadingPost ||
+                  isLoadingPut ||
+                  isLoadingUpdate ||
+                  isReadOnly()
+                }
               />
 
               <NumberInput
@@ -686,7 +767,13 @@ export default function SplitTheBill({
                   setShipping(e ?? '');
                   calculator();
                 }}
-                isDisabled={isLoadingCreate || isLoadingUpdate || isReadOnly()}
+                isDisabled={
+                  isLoadingCreate ||
+                  isLoadingPost ||
+                  isLoadingPut ||
+                  isLoadingUpdate ||
+                  isReadOnly()
+                }
               />
             </div>
           </div>
@@ -762,6 +849,8 @@ export default function SplitTheBill({
                                 }}
                                 isDisabled={
                                   isLoadingCreate ||
+                                  isLoadingPost ||
+                                  isLoadingPut ||
                                   isLoadingUpdate ||
                                   isReadOnly()
                                 }
@@ -846,7 +935,12 @@ export default function SplitTheBill({
                                     isReadOnly()
                                   }
                                   onClick={() => deletePerson(index)}
-                                  isLoading={isLoadingCreate || isLoadingUpdate}
+                                  isLoading={
+                                    isLoadingCreate ||
+                                    isLoadingPost ||
+                                    isLoadingPut ||
+                                    isLoadingUpdate
+                                  }
                                 >
                                   <TrashBin />
                                 </Button>
@@ -870,6 +964,8 @@ export default function SplitTheBill({
                                   }
                                   isDisabled={
                                     isLoadingCreate ||
+                                    isLoadingPost ||
+                                    isLoadingPut ||
                                     isLoadingUpdate ||
                                     isReadOnly()
                                   }
@@ -904,6 +1000,8 @@ export default function SplitTheBill({
                                   }}
                                   isDisabled={
                                     isLoadingCreate ||
+                                    isLoadingPost ||
+                                    isLoadingPut ||
                                     isLoadingUpdate ||
                                     isReadOnly()
                                   }
@@ -994,6 +1092,8 @@ export default function SplitTheBill({
                                   }}
                                   isDisabled={
                                     isLoadingCreate ||
+                                    isLoadingPost ||
+                                    isLoadingPut ||
                                     isLoadingUpdate ||
                                     isReadOnly()
                                   }
@@ -1016,7 +1116,11 @@ export default function SplitTheBill({
                   onClick={() => addColumn()}
                   isIconOnly
                   isDisabled={
-                    isLoadingCreate || isLoadingUpdate || isReadOnly()
+                    isLoadingCreate ||
+                    isLoadingPost ||
+                    isLoadingPut ||
+                    isLoadingUpdate ||
+                    isReadOnly()
                   }
                 />
               </div>
@@ -1035,7 +1139,12 @@ export default function SplitTheBill({
                 color='primary'
                 className='mt-4 max-w-fit'
                 onClick={() => addPerson()}
-                isDisabled={isLoadingCreate || isLoadingUpdate || isReadOnly()}
+                isDisabled={
+                  isLoadingCreate ||
+                  isLoadingPost ||
+                  isLoadingUpdate ||
+                  isReadOnly()
+                }
               >
                 Thêm dòng
               </Button>
@@ -1056,7 +1165,7 @@ export default function SplitTheBill({
                           Bạn có chắc chắn muốn xóa hóa đơn này không?
                         </div>
                       </ModalContent>
-                      <ModalFooter className='gap-4' id={id} />
+                      <ModalFooter className='gap-4' id={id.toString()} />
                     </ModalBody>
                   </Modal>
                 )}
@@ -1073,11 +1182,18 @@ export default function SplitTheBill({
                     !valueNameBill ||
                     isReadOnly()
                   }
-                  isLoading={isLoadingCreate || isLoadingUpdate}
+                  isLoading={
+                    isLoadingCreate ||
+                    isLoadingPost ||
+                    isLoadingPut ||
+                    isLoadingUpdate
+                  }
                 >
                   {isCreate
-                    ? 'Tạo mới và Copy markdown'
-                    : 'Lưu và Copy markdown'}
+                    ? 'Tạo mới và đăng thông tin lên mattermost'
+                    : dataBill.idPost
+                    ? 'Lưu và cập nhật tin bài đăng mattermost'
+                    : 'Lưu thông tin'}
                 </Button>
               </div>
             </div>

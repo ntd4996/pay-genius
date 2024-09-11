@@ -55,6 +55,10 @@ const billSchema = new Schema({
   deleteAt: {
     type: Date,
   },
+  idPost: {
+    type: String,
+    required: false,
+  },
 });
 
 billSchema.pre('validate', async function (next) {

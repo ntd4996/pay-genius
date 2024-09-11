@@ -194,7 +194,12 @@ export const AnimatedTooltip = ({
                 className='gap-4'
                 id={id}
                 refetch={refetch}
+                uid={data.uid}
+                headerTable={data.headerTable}
                 listTransferPerson={listTransferPerson}
+                nameBill={data.nameBill}
+                bankName={data.bank}
+                accountName={data.name}
               />
             </ModalBody>
           </Modal>
