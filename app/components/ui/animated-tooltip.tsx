@@ -200,6 +200,7 @@ export const AnimatedTooltip = ({
                 nameBill={data.nameBill}
                 bankName={data.bank}
                 accountName={data.name}
+                accountNumber={data.accountNumber}
               />
             </ModalBody>
           </Modal>
