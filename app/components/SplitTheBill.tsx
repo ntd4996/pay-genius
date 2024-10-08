@@ -488,13 +488,19 @@ export default function SplitTheBill({
           id: data.bill._id,
           message: markdownTable,
         });
-        toast.success('Đã cập nhật hóa hơn và bài mattermost thành công');
+        toast.success('Đã cập nhật hóa hơn và bài viết mattermost thành công');
       } else {
-        navigator.clipboard.writeText(markdownTable).then(() => {
-          setCopied(true);
-          toast.success('Đã cập nhật và Copy markdown thành công');
-          setTimeout(() => setCopied(false), 2000);
+        await postMessage({
+          id: data.bill._id,
+          message: markdownTable,
         });
+        toast.success('Đã cập nhật hóa hơn và đăng bài viết mattermost thành công');
+
+        // navigator.clipboard.writeText(markdownTable).then(() => {
+        //   setCopied(true);
+        //   toast.success('Đã cập nhật và Copy markdown thành công');
+        //   setTimeout(() => setCopied(false), 2000);
+        // });
       }
     },
     onError: (e) => {
