@@ -494,7 +494,9 @@ export default function SplitTheBill({
           id: data.bill._id,
           message: markdownTable,
         });
-        toast.success('Đã cập nhật hóa hơn và đăng bài viết mattermost thành công');
+        toast.success(
+          'Đã cập nhật hóa hơn và đăng bài viết mattermost thành công'
+        );
 
         // navigator.clipboard.writeText(markdownTable).then(() => {
         //   setCopied(true);

@@ -82,8 +82,11 @@ export async function GET(request: NextRequest) {
       statusFilter.size > 0
         ? { status: { $in: Array.from(statusFilter) } }
         : {};
+
+    const isAdmin = token.email === 'ntd4996@gmail.com';
+
     const listBills = await Bill.find({
-      createBy: token.email,
+      ...(isAdmin ? {} : { createBy: token.email }),
       ...searchCondition,
       ...statusCondition,
     })
@@ -93,11 +96,11 @@ export async function GET(request: NextRequest) {
       .skip(skip)
       .limit(limit);
 
-    const totalBills = await Bill.countDocuments({
-      createBy: token.email,
-    });
+    const totalBills = await Bill.countDocuments(
+      isAdmin ? {} : { createBy: token.email }
+    );
 
-    const allBills = await Bill.find({ createBy: token.email });
+    const allBills = await Bill.find(isAdmin ? {} : { createBy: token.email });
 
     let totalChecked = 0;
     let totalUnChecked = 0;

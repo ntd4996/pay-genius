@@ -44,13 +44,13 @@ export const sumTotalBill = (listTransferPerson: any[]) => {
   return sumValues;
 };
 
-export const processString = (input: string): string => {
-  const index = input.indexOf(' ');
+export const processString = (input: string | null): string => {
+  if (!input) return '';
 
+  const index = input.indexOf(' ');
   if (index === -1) {
     return input;
   }
-
   return input.substring(0, index);
 };
 
