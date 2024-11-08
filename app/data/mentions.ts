@@ -59,6 +59,14 @@ export const Mentions = [
     value: '@trant :yaotea:',
     label: '@trant',
   },
+  // {
+  //   value: '@linhlh :deckcandoi:',
+  //   label: '@linhlh',
+  // },
+  // {
+  //   value: '@tuandn :deckcandoi:',
+  //   label: '@tuandn',
+  // },
   {
     value: '@bacnp :phuongbac:',
     label: '@bacnp',
