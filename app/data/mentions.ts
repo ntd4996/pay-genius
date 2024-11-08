@@ -60,15 +60,19 @@ export const Mentions = [
     label: '@trant',
   },
   {
-    value: '@linhlh :deckcandoi:',
-    label: '@linhlh',
-  },
-  {
-    value: '@tuandn :deckcandoi:',
-    label: '@tuandn',
-  },
-  {
     value: '@bacnp :phuongbac:',
     label: '@bacnp',
+  },
+  {
+    value: '@duydv :minh_elsa:',
+    label: '@duydv',
+  },
+  {
+    value: '@datvt :oo:',
+    label: '@datvt',
+  },
+  {
+    value: '@quyetnp :anabelle:',
+    label: '@quyetnp',
   },
 ];
