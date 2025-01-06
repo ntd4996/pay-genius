@@ -21,6 +21,10 @@ const accountSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  idMattermost: {
+    type: String,
+    required: false,
+  },
 });
 const Account =
   mongoose.models.account || mongoose.model('account', accountSchema);

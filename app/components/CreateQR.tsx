@@ -16,6 +16,10 @@ import { DataBank } from '../data/bank';
 import axios from '../libs/axios';
 import { useMutation } from '@tanstack/react-query';
 import NumberInput from './NumberInput';
+import {
+  Modal as ModalNextUI,
+  ModalContent as ModalContentNextUI,
+} from '@nextui-org/react';
 
 export default function CreateQR() {
   const {
@@ -24,6 +28,9 @@ export default function CreateQR() {
     setValue,
     formState: { errors },
   } = useForm({ mode: 'all' });
+
+  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
+  const [selectedQRImage, setSelectedQRImage] = useState('');
 
   const [listUsers, setListUsers] = useState<any[]>([]);
   const [selectedKeyName, setSelectedKeyName] = useState<any>('');
@@ -232,10 +239,37 @@ export default function CreateQR() {
               width={300}
               alt='NextUI hero Image'
               src={`https://img.vietqr.io/image/${valueBank}-${valueAccountNumber}-print.png?amount=${valueAmount}&accountName=${valueName}`}
+              onClick={() => {
+                setSelectedQRImage(
+                  `https://img.vietqr.io/image/${valueBank}-${valueAccountNumber}-print.png?amount=${valueAmount}&accountName=${valueName}`
+                );
+                setIsQRModalOpen(true);
+              }}
+              className='cursor-pointer'
             />
           </div>
         </div>
       </CardBody>
+      <ModalNextUI
+        isOpen={isQRModalOpen}
+        onOpenChange={() => setIsQRModalOpen(false)}
+        size='full'
+        classNames={{
+          backdrop: 'bg-black/70',
+          base: 'flex items-center justify-center',
+          closeButton: 'z-50',
+        }}
+      >
+        <ModalContentNextUI>
+          <div className='relative flex h-screen w-screen items-center justify-center'>
+            <Image
+              alt='QR Code Full Size'
+              className='max-h-[90vh] max-w-[90%] object-contain'
+              src={selectedQRImage}
+            />
+          </div>
+        </ModalContentNextUI>
+      </ModalNextUI>
     </Card>
   );
 }

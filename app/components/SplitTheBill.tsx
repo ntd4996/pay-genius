@@ -42,6 +42,10 @@ import {
   ModalFooter,
   ModalTrigger,
 } from './ui/animated-modal';
+import {
+  Modal as ModalNextUI,
+  ModalContent as ModalContentNextUI,
+} from '@nextui-org/react';
 import { useSession } from 'next-auth/react';
 
 interface SplitTheBillProps {
@@ -91,6 +95,8 @@ export default function SplitTheBill({
   const [shipping, setShipping] = useState('');
   const [copied, setCopied] = useState(false);
   const [idOrder, setIdOrder] = useState('');
+  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
+  const [selectedQRImage, setSelectedQRImage] = useState('');
 
   const [headerTable, setHeaderTable] = useState([
     {
@@ -233,6 +239,12 @@ export default function SplitTheBill({
       .map((person: any, index) => {
         return `| ${updatedHeader
           .map((header: any, indexColumn) => {
+            console.log('🚀 ~ .map ~ indexColumn:', indexColumn);
+            console.log('🚀 ~ bodyMarkdown ~ header:', header);
+            console.log(
+              '🚀 ~ bodyMarkdown ~ header:',
+              person[`value-${indexColumn + 3}`]
+            );
             switch (header.label) {
               case 'Đã thanh toán':
                 return person.checked ? ':white_check_mark:' : '';
@@ -259,7 +271,7 @@ export default function SplitTheBill({
                 )} =200x256)`;
               default:
                 return formatCurrencyVND(
-                  Math.round(parseInt(person[`value-${indexColumn + 4}`] ?? 0))
+                  Math.round(parseInt(person[`value-${indexColumn + 3}`] ?? 0))
                 );
             }
           })
@@ -796,6 +808,16 @@ export default function SplitTheBill({
                   idOrder ?? '',
                   ''
                 )}`}
+                onClick={() => {
+                  setSelectedQRImage(
+                    `https://img.vietqr.io/image/${selectedKeyBank}-${valueAccountNumber}-print.png?accountName=${selectedKeyName}&addInfo=${getInfoBill(
+                      valueNameBill ?? '',
+                      idOrder ?? '',
+                      ''
+                    )}`
+                  );
+                  setIsQRModalOpen(true);
+                }}
               />
             ) : (
               <div>
@@ -1053,18 +1075,35 @@ export default function SplitTheBill({
                                 {selectedKeyBank &&
                                 valueAccountNumber &&
                                 selectedKeyName ? (
-                                  <Image
-                                    width={200}
-                                    alt='NextUI hero Image'
-                                    src={`https://img.vietqr.io/image/${selectedKeyBank}-${valueAccountNumber}-print.png?amount=${sumTotal(
-                                      listTransferPerson,
-                                      index
-                                    )}&accountName=${selectedKeyName}&addInfo=${getInfoBill(
-                                      valueNameBill ?? '',
-                                      idOrder ?? '',
-                                      listTransferPerson[index].mention ?? ''
-                                    )}`}
-                                  />
+                                  <>
+                                    <Image
+                                      width={200}
+                                      alt='QR Code'
+                                      className='cursor-pointer'
+                                      src={`https://img.vietqr.io/image/${selectedKeyBank}-${valueAccountNumber}-print.png?amount=${sumTotal(
+                                        listTransferPerson,
+                                        index
+                                      )}&accountName=${selectedKeyName}&addInfo=${getInfoBill(
+                                        valueNameBill ?? '',
+                                        idOrder ?? '',
+                                        listTransferPerson[index].mention ?? ''
+                                      )}`}
+                                      onClick={() => {
+                                        setSelectedQRImage(
+                                          `https://img.vietqr.io/image/${selectedKeyBank}-${valueAccountNumber}-print.png?amount=${sumTotal(
+                                            listTransferPerson,
+                                            index
+                                          )}&accountName=${selectedKeyName}&addInfo=${getInfoBill(
+                                            valueNameBill ?? '',
+                                            idOrder ?? '',
+                                            listTransferPerson[index].mention ??
+                                              ''
+                                          )}`
+                                        );
+                                        setIsQRModalOpen(true);
+                                      }}
+                                    />
+                                  </>
                                 ) : (
                                   <div>
                                     <Lottie
@@ -1208,6 +1247,27 @@ export default function SplitTheBill({
           )}
         </div>
       </div>
+
+      <ModalNextUI
+        isOpen={isQRModalOpen}
+        onOpenChange={() => setIsQRModalOpen(false)}
+        size='full'
+        classNames={{
+          backdrop: 'bg-black/70',
+          base: 'flex items-center justify-center',
+          closeButton: 'z-50',
+        }}
+      >
+        <ModalContentNextUI>
+          <div className='relative flex h-screen w-screen items-center justify-center'>
+            <Image
+              alt='QR Code Full Size'
+              className='max-h-[90vh] max-w-[90%] object-contain'
+              src={selectedQRImage}
+            />
+          </div>
+        </ModalContentNextUI>
+      </ModalNextUI>
     </Fragment>
   );
 }

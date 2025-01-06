@@ -96,9 +96,11 @@ export async function GET(request: NextRequest) {
       .skip(skip)
       .limit(limit);
 
-    const totalBills = await Bill.countDocuments(
-      isAdmin ? {} : { createBy: token.email }
-    );
+    const totalBills = await Bill.countDocuments({
+      ...(isAdmin ? {} : { createBy: token.email }),
+      ...searchCondition,
+      ...statusCondition,
+    });
 
     const allBills = await Bill.find(isAdmin ? {} : { createBy: token.email });
 
@@ -128,7 +130,8 @@ export async function GET(request: NextRequest) {
     let listMentionBillsUnSuccess = [] as any[];
 
     if (username) {
-      const regex = new RegExp(`^@${username}`, 'i');
+      // Tạo regex chính xác cho username, thêm @ ở đầu và khoảng trắng hoặc dấu phẩy ở cuối
+      const regex = new RegExp(`@${username}(?:[\\s,]|$)`, 'i');
 
       const listMentionBills = await Bill.find({
         'listTransferPerson.mention': { $regex: regex },
@@ -137,14 +140,29 @@ export async function GET(request: NextRequest) {
 
       listMentionBillsUnSuccess = listMentionBills.flatMap((bill) =>
         bill.listTransferPerson
-          .filter(
-            (person: any) => regex.test(person.mention) && !person.checked
-          )
-          .map((person: any) => ({
-            id: bill._id,
-            nameBill: bill.nameBill,
-            moneyAfterReduction: person.moneyAfterReduction,
-          }))
+          .filter((person: any) => {
+            const mentions = person.mention.split(/[\s,]+/);
+            return (
+              mentions.some(
+                (m: any) => m.toLowerCase() === `@${username}`.toLowerCase()
+              ) && !person.checked
+            );
+          })
+          .map((person: any) => {
+            return {
+              id: bill._id,
+              nameBill: bill.nameBill,
+              moneyAfterReduction: Object.entries(person).reduce(
+                (total, [key, value]) => {
+                  if (key.startsWith('value-') && !isNaN(Number(value))) {
+                    return total + Number(value);
+                  }
+                  return total;
+                },
+                person.moneyAfterReduction || 0
+              ),
+            };
+          })
       );
     }
 

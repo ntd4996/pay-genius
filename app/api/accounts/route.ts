@@ -5,29 +5,20 @@ import Account from '@/utils/models/account';
 import { getToken } from 'next-auth/jwt';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
-  await connect();
+export async function GET(request: Request) {
   try {
-    const token = await getToken({
-      req: request,
-      secret: process.env.NEXTAUTH_SECRET,
-    });
+    await connect();
 
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { searchParams } = new URL(request.url);
+    const search = searchParams.get('search') || '';
 
-    const listAccounts = await Account.find({});
-    return NextResponse.json(
-      {
-        message: 'List accounts',
-        success: true,
-        accounts: listAccounts,
-      },
-      { status: 200 }
-    );
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const query = search ? { name: { $regex: search, $options: 'i' } } : {};
+
+    const accounts = await Account.find(query).sort({ createdAt: -1 });
+
+    return NextResponse.json({ accounts }, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ error }, { status: 500 });
   }
 }
 
