@@ -23,5 +23,11 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/split-the-bill/:path*', '/create-qr', '/split-the-bill'],
+  matcher: [
+    '/',
+    '/split-the-bill/:path*',
+    '/create-qr',
+    '/split-the-bill',
+    '/unpaid',
+  ],
 };

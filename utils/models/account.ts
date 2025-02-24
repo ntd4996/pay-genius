@@ -25,6 +25,9 @@ const accountSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+}, {
+  timestamps: true,
+  collection: 'accounts'
 });
 const Account =
   mongoose.models.account || mongoose.model('account', accountSchema);

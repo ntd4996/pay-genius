@@ -29,7 +29,7 @@ export default function DashboardLayout({
     );
 
   return (
-    <div className='bg-[#F4f4f4]'>
+    <div className='min-h-screen bg-[#F4f4f4]'>
       <Header />
       {children}
     </div>

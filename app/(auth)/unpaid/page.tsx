@@ -23,6 +23,7 @@ import Lottie from 'react-lottie';
 import loadingEarthJson from '@/app/components/lotties/json/loading-earth.json';
 import { getInfoBill } from '@/lib/utils';
 import QR from '@/app/assets/svg/QR';
+import { useSession } from 'next-auth/react';
 
 export default function UnpaidBills() {
   const router = useRouter();
@@ -31,6 +32,14 @@ export default function UnpaidBills() {
   const [listData, setListData] = useState([]);
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   const [selectedQRImage, setSelectedQRImage] = useState('');
+  const { data: session } = useSession();
+
+  const getMention = useCallback(() => {
+    const email = session?.user?.email;
+    if (!email) return '';
+    const atIndex = email.indexOf('@');
+    return atIndex !== -1 ? email.substring(0, atIndex) : email;
+  }, [session]);
 
   const { isLoading } = useQuery({
     queryKey: [`get-unpaid-bills`, page],
@@ -62,45 +71,50 @@ export default function UnpaidBills() {
     return totalBills ? Math.ceil(totalBills / 10) : 0;
   }, [totalBills]);
 
-  const renderCell = useCallback((data: any, columnKey: React.Key) => {
-    switch (columnKey) {
-      case 'nameBill':
-        return data.nameBill;
-      case 'amount':
-        return (
-          <div className='text-primary'>
-            {formatCurrency(Math.round(data.moneyAfterReduction) || 0)}
-          </div>
-        );
-      case 'qr':
-        return (
-          <div className='flex items-center justify-center'>
-            <Button
-              color='primary'
-              variant='flat'
-              onPress={() => {
-                setSelectedQRImage(
-                  `https://img.vietqr.io/image/${data.bank}-${
-                    data.accountNumber
-                  }-print.png?accountName=${data.name}&addInfo=${getInfoBill(
-                    data.nameBill ?? '',
-                    data.uid ?? '',
-                    ''
-                  )}`
-                );
-                setIsQRModalOpen(true);
-              }}
-              className='capitalize'
-            >
-              hiển thị QR
-              <QR className='w-fit text-default-400' />
-            </Button>
-          </div>
-        );
-      default:
-        return null;
-    }
-  }, []);
+  const renderCell = useCallback(
+    (data: any, columnKey: React.Key) => {
+      switch (columnKey) {
+        case 'nameBill':
+          return data.nameBill;
+        case 'amount':
+          return (
+            <div className='text-primary'>
+              {formatCurrency(Math.round(data.moneyAfterReduction) || 0)}
+            </div>
+          );
+        case 'qr':
+          return (
+            <div className='flex items-center justify-center'>
+              <Button
+                color='primary'
+                variant='flat'
+                onPress={() => {
+                  setSelectedQRImage(
+                    `https://img.vietqr.io/image/${data.bank}-${
+                      data.accountNumber
+                    }-print.png?amount=${
+                      data.moneyAfterReduction
+                    }&accountName=${data.name}&addInfo=${getInfoBill(
+                      data.nameBill ?? '',
+                      data.uid ?? '',
+                      getMention() ?? ''
+                    )}`
+                  );
+                  setIsQRModalOpen(true);
+                }}
+                className='capitalize'
+              >
+                hiển thị QR
+                <QR className='w-fit text-default-400' />
+              </Button>
+            </div>
+          );
+        default:
+          return null;
+      }
+    },
+    [getMention]
+  );
 
   return (
     <div className='mx-auto max-w-screen-xl px-4 py-8'>
