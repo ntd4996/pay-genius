@@ -457,8 +457,17 @@ export default function Home() {
               <div className='relative flex flex-1  flex-col gap-6 overflow-hidden rounded-3xl border px-4 py-6'>
                 {listMentionBills?.length > 0 ? (
                   <Fragment>
-                    <div className='text-center text-2xl'>
-                      Hóa đơn chưa thanh toán
+                    <div className='flex items-center justify-between'>
+                      <div className='text-center text-2xl'>
+                        Hóa đơn chưa thanh toán
+                      </div>
+                      <Button
+                        color='primary'
+                        variant='flat'
+                        onClick={() => router.push('/unpaid')}
+                      >
+                        Xem tất cả
+                      </Button>
                     </div>
                     <table className='max-h-[500px]'>
                       <thead>

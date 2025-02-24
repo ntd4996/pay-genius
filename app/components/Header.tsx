@@ -21,6 +21,7 @@ import { signOut, useSession } from 'next-auth/react';
 import { usePathname, useRouter } from 'next/navigation';
 import Cut from '../assets/svg/Cut';
 import QR from '../assets/svg/QR';
+import { ClockIcon } from '@heroicons/react/24/outline';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -86,6 +87,18 @@ export default function Header() {
             >
               <QR />
               Tạo mã QR
+            </Link>
+          </NavbarItem>
+          <NavbarItem isActive={path.includes('/unpaid')}>
+            <Link
+              href='/unpaid'
+              className={cn(
+                path.includes('/unpaid') ? 'text-primary' : 'text-[#191a1f]',
+                'flex gap-2'
+              )}
+            >
+              <ClockIcon className='h-5 w-5' />
+              Chưa thanh toán
             </Link>
           </NavbarItem>
         </div>
