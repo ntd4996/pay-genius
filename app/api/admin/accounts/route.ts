@@ -51,7 +51,7 @@ export async function POST(request: Request) {
       idMattermost: idMattermost || '',
       updateAt: new Date(),
     });
-    
+
     const savedAccount = await account.save();
     console.log('Created account:', savedAccount);
     return NextResponse.json(savedAccount);

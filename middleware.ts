@@ -36,6 +36,6 @@ export const config = {
     '/create-qr',
     '/split-the-bill',
     '/unpaid',
-    '/admin/:path*'
+    '/admin/:path*',
   ],
 };

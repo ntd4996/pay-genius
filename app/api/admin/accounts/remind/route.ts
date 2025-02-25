@@ -114,6 +114,7 @@ ${unpaidBills
 
 Vui lòng thanh toán các hóa đơn trên để đảm bảo quyền lợi của bạn và những người khác.
 Nếu bạn đã thanh toán, vui lòng liên hệ tới người tạo đơn và bỏ qua tin nhắn này.
+Nếu bạn muốn thanh toán nhiều hơn 1 lần thì cứ tự nhiên :yaotea: 
 
 🔍 Xem tất cả hóa đơn chưa thanh toán của bạn tại: [https://qr-payshare.datnt.dev/unpaid](https://qr-payshare.datnt.dev/unpaid)
 

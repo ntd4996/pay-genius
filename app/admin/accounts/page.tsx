@@ -68,7 +68,13 @@ export default function AdminAccounts() {
       }
       onClose();
       fetchAccounts();
-      setFormData({ name: '', accountNumber: '', codeBank: '', mention: '', idMattermost: '' });
+      setFormData({
+        name: '',
+        accountNumber: '',
+        codeBank: '',
+        mention: '',
+        idMattermost: '',
+      });
       setSelectedAccount(null);
     } catch (error) {
       toast.error('Có lỗi xảy ra');
@@ -104,11 +110,13 @@ export default function AdminAccounts() {
     try {
       const response = await axios.get('/api/admin/accounts/remind');
       const { debtData, messageResults } = response.data;
-      
+
       if (debtData.length === 0) {
         toast.info('Không có người dùng nào cần nhắc nợ');
       } else {
-        toast.success(`Đã tìm thấy ${debtData.length} người dùng có hóa đơn chưa thanh toán`);
+        toast.success(
+          `Đã tìm thấy ${debtData.length} người dùng có hóa đơn chưa thanh toán`
+        );
         console.log('Chi tiết nợ:', debtData);
         console.log('Kết quả gửi tin nhắn:', messageResults);
       }
@@ -121,22 +129,28 @@ export default function AdminAccounts() {
   };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Quản lý tài khoản</h1>
-        <div className="flex gap-2">
+    <div className='p-6'>
+      <div className='mb-6 flex items-center justify-between'>
+        <h1 className='text-2xl font-bold'>Quản lý tài khoản</h1>
+        <div className='flex gap-2'>
           <Button
-            color="warning"
+            color='warning'
             onPress={handleRemindDebts}
             isLoading={isLoading}
           >
             Nhắc nợ
           </Button>
-          <Button 
-            color="primary" 
+          <Button
+            color='primary'
             onPress={() => {
               setSelectedAccount(null);
-              setFormData({ name: '', accountNumber: '', codeBank: '', mention: '', idMattermost: '' });
+              setFormData({
+                name: '',
+                accountNumber: '',
+                codeBank: '',
+                mention: '',
+                idMattermost: '',
+              });
               onOpen();
             }}
           >
@@ -145,7 +159,7 @@ export default function AdminAccounts() {
         </div>
       </div>
 
-      <Table aria-label="Danh sách tài khoản" className="mb-6">
+      <Table aria-label='Danh sách tài khoản' className='mb-6'>
         <TableHeader>
           <TableColumn>TÊN</TableColumn>
           <TableColumn>SỐ TÀI KHOẢN</TableColumn>
@@ -164,22 +178,26 @@ export default function AdminAccounts() {
               <TableCell>{account.codeBank}</TableCell>
               <TableCell>{account.mention || '-'}</TableCell>
               <TableCell>{account.idMattermost || '-'}</TableCell>
-              <TableCell>{new Date(account.createdAt).toLocaleDateString('vi-VN')}</TableCell>
-              <TableCell>{new Date(account.updateAt).toLocaleDateString('vi-VN')}</TableCell>
               <TableCell>
-                <div className="flex gap-2">
-                  <Button 
-                    color="primary" 
-                    variant="light" 
-                    size="sm"
+                {new Date(account.createdAt).toLocaleDateString('vi-VN')}
+              </TableCell>
+              <TableCell>
+                {new Date(account.updateAt).toLocaleDateString('vi-VN')}
+              </TableCell>
+              <TableCell>
+                <div className='flex gap-2'>
+                  <Button
+                    color='primary'
+                    variant='light'
+                    size='sm'
                     onPress={() => handleEdit(account)}
                   >
                     Sửa
                   </Button>
-                  <Button 
-                    color="danger" 
-                    variant="light" 
-                    size="sm"
+                  <Button
+                    color='danger'
+                    variant='light'
+                    size='sm'
                     onPress={() => handleDelete(account._id)}
                   >
                     Xóa
@@ -193,42 +211,54 @@ export default function AdminAccounts() {
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalContent>
-          <ModalHeader>{selectedAccount ? 'Sửa tài khoản' : 'Thêm tài khoản'}</ModalHeader>
+          <ModalHeader>
+            {selectedAccount ? 'Sửa tài khoản' : 'Thêm tài khoản'}
+          </ModalHeader>
           <ModalBody>
-            <div className="space-y-4">
+            <div className='space-y-4'>
               <Input
-                label="Tên"
+                label='Tên'
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
               />
               <Input
-                label="Số tài khoản"
+                label='Số tài khoản'
                 value={formData.accountNumber}
-                onChange={(e) => setFormData({ ...formData, accountNumber: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, accountNumber: e.target.value })
+                }
               />
               <Input
-                label="Mã ngân hàng"
+                label='Mã ngân hàng'
                 value={formData.codeBank}
-                onChange={(e) => setFormData({ ...formData, codeBank: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, codeBank: e.target.value })
+                }
               />
               <Input
-                label="Mention"
+                label='Mention'
                 value={formData.mention}
-                onChange={(e) => setFormData({ ...formData, mention: e.target.value })}
-                placeholder="@username"
+                onChange={(e) =>
+                  setFormData({ ...formData, mention: e.target.value })
+                }
+                placeholder='@username'
               />
               <Input
-                label="ID Mattermost (không bắt buộc)"
+                label='ID Mattermost (không bắt buộc)'
                 value={formData.idMattermost}
-                onChange={(e) => setFormData({ ...formData, idMattermost: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, idMattermost: e.target.value })
+                }
               />
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button color="danger" variant="light" onPress={onClose}>
+            <Button color='danger' variant='light' onPress={onClose}>
               Hủy
             </Button>
-            <Button color="primary" onPress={handleSubmit}>
+            <Button color='primary' onPress={handleSubmit}>
               {selectedAccount ? 'Cập nhật' : 'Thêm'}
             </Button>
           </ModalFooter>
@@ -236,4 +266,4 @@ export default function AdminAccounts() {
       </Modal>
     </div>
   );
-} 
+}

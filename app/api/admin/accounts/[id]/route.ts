@@ -26,7 +26,13 @@ export async function PUT(
     const { id } = params;
     const body = await request.json();
     const { name, accountNumber, codeBank, mention, idMattermost } = body;
-    console.log('Updating account with data:', { name, accountNumber, codeBank, mention, idMattermost });
+    console.log('Updating account with data:', {
+      name,
+      accountNumber,
+      codeBank,
+      mention,
+      idMattermost,
+    });
 
     await connect();
 
