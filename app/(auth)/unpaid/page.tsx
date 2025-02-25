@@ -60,13 +60,6 @@ export default function UnpaidBills() {
     }).format(amount);
   };
 
-  const redirectToDetail = useCallback(
-    (id: string) => {
-      router.push('/split-the-bill/' + id);
-    },
-    [router]
-  );
-
   const pages = useMemo(() => {
     return totalBills ? Math.ceil(totalBills / 10) : 0;
   }, [totalBills]);

@@ -13,6 +13,10 @@ const accountSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  mention: {
+    type: String,
+    default: '',
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -23,7 +27,7 @@ const accountSchema = new mongoose.Schema({
   },
   idMattermost: {
     type: String,
-    required: false,
+    default: '',
   },
 }, {
   timestamps: true,
