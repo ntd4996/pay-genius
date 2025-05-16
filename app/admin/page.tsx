@@ -212,6 +212,14 @@ export default function AdminDashboard() {
                 </div>
               ))}
             </div>
+            <div className='mt-4 text-center'>
+              <a
+                href='/admin/top-users-bills'
+                className='rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600'
+              >
+                Xem chi tiết
+              </a>
+            </div>
           </CardBody>
         </Card>
         <Card>
@@ -234,6 +242,14 @@ export default function AdminDashboard() {
                 </div>
               ))}
             </div>
+            <div className='mt-4 text-center'>
+              <a
+                href='/admin/unpaid-bills'
+                className='rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600'
+              >
+                Xem chi tiết
+              </a>
+            </div>
           </CardBody>
         </Card>
         <Card>
@@ -255,6 +271,14 @@ export default function AdminDashboard() {
                   </span>
                 </div>
               ))}
+            </div>
+            <div className='mt-4 text-center'>
+              <a
+                href='/admin/top-bill-creators'
+                className='rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600'
+              >
+                Xem chi tiết
+              </a>
             </div>
           </CardBody>
         </Card>

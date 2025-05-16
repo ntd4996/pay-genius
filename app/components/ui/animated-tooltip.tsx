@@ -18,7 +18,12 @@ import {
 } from './animated-modal';
 import TrashBin from '@/app/assets/svg/TrashBin';
 import EyeIcon from '@/app/assets/svg/EyeIcon';
-import { formatCurrencyVND, processString, sumTotalBill } from '@/lib/utils';
+import {
+  formatCurrencyVND,
+  processString,
+  sumTotal,
+  sumTotalBill,
+} from '@/lib/utils';
 import { Checkbox } from '@nextui-org/react';
 
 export const AnimatedTooltip = ({
@@ -175,7 +180,7 @@ export const AnimatedTooltip = ({
                                   <td className='text-left'>
                                     <div className='text-primary'>
                                       {formatCurrencyVND(
-                                        parseInt(item.moneyAfterReduction) || 0
+                                        sumTotal(listTransferPerson, index) || 0
                                       )}
                                     </div>
                                   </td>
